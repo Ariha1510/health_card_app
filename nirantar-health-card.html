@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nirantar Health Card - Offline QR Portal</title>
+    <!-- Cryptography Library (AES) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" integrity="sha512-E8QSvWZ0GeFmRmqXSxAT6m54641ECGlCFOPhyRTFODyRJ58SMLVYojgqRYgG1S142FMv62O5OCB290QqNDccMw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- QR Code Compiler Library (Canvas) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.1/qrcode.min.js" integrity="sha512-c2e7rrlPjJd+n22H2N5Fphg1F2Kx3T06s53Rkh9npi32Wj+zQ46YVnS68V95c479W1U48vT9JjDq3K3Z1aCgkg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- HTML5 QR Code Scanner Library (Camera) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js" integrity="sha512-r6rDA7W6ZeQhvl8S7yRV0VUur54gUNfyNyCXHB3CD3vEGsd0vV/gFzzgQLyXbSQ/+5Wy/kLoFEsLSU11SnhM1A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg-primary: #060e11;
+            --bg-secondary: #0d1e24;
+            --bg-card: rgba(13, 30, 36, 0.8);
+            --border-color: rgba(45, 212, 191, 0.15);
+            --accent-primary: #0d9488;
+            --accent-primary-glow: rgba(13, 148, 136, 0.3);
+            --accent-success: #2dd4bf;
+            --accent-success-glow: rgba(45, 212, 191, 0.25);
+            --accent-warning: #f43f5e;
+            --accent-warning-glow: rgba(244, 63, 94, 0.25);
+            --text-main: #e2f8f5;
+            --text-muted: #85a3a7;
+            --font-sans: 'Outfit', sans-serif;
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: radial-gradient(circle at top, #0d1e24 0%, #060e11 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header & Navigation */
+        header {
+            background: rgba(6, 14, 17, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-success) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: white;
+            box-shadow: 0 0 15px var(--accent-primary-glow);
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            background: linear-gradient(to right, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: var(--accent-success);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-btn.active {
+            color: var(--accent-primary);
+            background: rgba(14, 165, 233, 0.1);
+            border-color: rgba(14, 165, 233, 0.2);
+        }
+
+        /* Offline Indicator Bar */
+        .status-bar {
+            background: rgba(16, 185, 129, 0.15);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 0.5rem 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--accent-success);
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-success);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        .airplane-toggle {
+            margin-left: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .airplane-toggle.active {
+            background: var(--accent-warning);
+            color: white;
+            border-color: var(--accent-warning);
+        }
+
+        /* Main Layout */
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .view-container {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .view-container.active {
+            display: block;
+        }
+
+        /* Dashboard View */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+        }
+
+        .hero-section h2 {
+            font-size: 2.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-section p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .action-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(14, 165, 233, 0.4);
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.1);
+        }
+
+        .action-card-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            transition: var(--transition-smooth);
+        }
+
+        .action-card:hover .action-card-icon {
+            transform: scale(1.1);
+        }
+
+        .action-card.generate:hover .action-card-icon {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-success);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .action-card.scan:hover .action-card-icon {
+            background: rgba(14, 165, 233, 0.1);
+            color: var(--accent-primary);
+            border-color: rgba(14, 165, 233, 0.3);
+        }
+
+        .action-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .action-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition-smooth);
+        }
+
+        .generate .action-btn {
+            background: var(--accent-success);
+            color: white;
+        }
+
+        .generate .action-btn:hover {
+            background: #059669;
+            box-shadow: 0 0 15px var(--accent-success-glow);
+        }
+
+        .scan .action-btn {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .scan .action-btn:hover {
+            background: #0284c7;
+            box-shadow: 0 0 15px var(--accent-primary-glow);
+        }
+
+        /* Feature Details Grid */
+        .features-section {
+            border-top: 1px solid var(--border-color);
+            padding-top: 3rem;
+        }
+
+        .features-section h3 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-box {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .feature-box h4 {
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .feature-box p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Generator & Scanner Panes */
+        .pane-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .pane-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card-panel {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .card-panel h3 {
+            font-size: 1.35rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            background: rgba(6, 14, 17, 0.7);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 8px var(--accent-primary-glow);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition-smooth);
+        }
+
+        .checkbox-label:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .checkbox-label input {
+            accent-color: var(--accent-primary);
+        }
+
+        /* Print/Output Panel */
+        .preview-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .id-card-frame {
+            width: 100%;
+            max-width: 380px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid var(--accent-success);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .id-card-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to right, var(--accent-primary), var(--accent-success));
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-title h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .card-title p {
+            font-size: 0.65rem;
+            color: var(--accent-success);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .card-body-layout {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .card-details {
+            flex: 1;
+            font-size: 0.8rem;
+        }
+
+        .card-details p {
+            margin-bottom: 0.4rem;
+            line-height: 1.4;
+        }
+
+        .card-details span {
+            color: var(--text-muted);
+        }
+
+        .card-qr-container {
+            background: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 120px;
+            height: 120px;
+        }
+
+        .card-qr-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .card-footer {
+            margin-top: 1rem;
+            border-top: 1px dotted var(--border-color);
+            padding-top: 0.5rem;
+            text-align: center;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-success) 0%, #059669 100%);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 15px var(--accent-success-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Scanner Layout */
+        .scanner-container {
+            width: 100%;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            border: 1px solid var(--border-color);
+            aspect-ratio: 4/3;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #reader {
+            width: 100%;
+            height: 100%;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .scanner-laser {
+            width: 80%;
+            height: 2px;
+            background: var(--accent-primary);
+            box-shadow: 0 0 15px var(--accent-primary), 0 0 5px var(--accent-primary);
+            position: absolute;
+            animation: scannerScan 2.5s infinite linear;
+        }
+
+        .scanner-frame {
+            width: 70%;
+            height: 70%;
+            border: 2px dashed rgba(14, 165, 233, 0.5);
+            border-radius: 16px;
+            position: relative;
+        }
+
+        /* File Upload Scanner Fallback */
+        .fallback-scanner {
+            margin-top: 1rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .fallback-scanner p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* Decoded Health Dashboard */
+        .health-dashboard {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: none;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .health-dashboard.active {
+            display: block;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .patient-badge {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .patient-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-success) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .patient-meta h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .patient-meta p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .blood-group-badge {
+            background: rgba(244, 63, 94, 0.15);
+            border: 1px solid var(--accent-warning);
+            color: var(--accent-warning);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .medical-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .medical-card {
+            background: rgba(6, 14, 17, 0.45);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .medical-card h5 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .condition-list, .allergy-list, .vaccine-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .tag.condition {
+            background: rgba(14, 165, 233, 0.15);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            color: var(--accent-primary);
+        }
+
+        .tag.allergy {
+            background: rgba(244, 63, 94, 0.15);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            color: var(--accent-warning);
+            animation: flash 2s infinite ease-in-out;
+        }
+
+        .tag.vaccine {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--accent-success);
+        }
+
+        .tag.none {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.9); }
+        }
+
+        @keyframes scannerScan {
+            0% { top: 10%; }
+            50% { top: 90%; }
+            100% { top: 10%; }
+        }
+
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; background: rgba(244, 63, 94, 0.25); }
+        }
+
+        /* Footer styling */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header containing logo and navigation tabs -->
+    <header>
+        <div class="header-container">
+            <div class="logo-section">
+                <div class="logo-icon">N</div>
+                <div class="logo-text">
+                    <h1>Nirantar Health</h1>
+                    <p>Offline Health Continuity Portal</p>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <button class="nav-btn active" data-target="dashboard-view">Dashboard</button>
+                <button class="nav-btn" data-target="generator-view">Card Generator</button>
+                <button class="nav-btn" data-target="scanner-view">Card Scanner</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Network state notification bar -->
+    <div class="status-bar">
+        <div class="status-dot"></div>
+        <span>System Running Offline (ABHA Last-Mile Sandbox)</span>
+        <button class="airplane-toggle" id="airplane-toggle">🌐 Simulate Offline</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <main>
+        
+        <!-- DASHBOARD VIEW -->
+        <div id="dashboard-view" class="view-container active">
+            <div class="hero-section">
+                <h2>Zero-Connectivity Patient Ledger</h2>
+                <p>Nirantar QR compresses vital medical data, encrypts it, and embeds it directly into the pixels of a QR code. Healthcare clinics can scan, decrypt, and read worker records completely offline.</p>
+            </div>
+
+            <div class="action-grid">
+                <!-- Action Card 1: Generate -->
+                <div class="action-card generate">
+                    <div class="action-card-icon">📋</div>
+                    <h3>Volunteer Portal</h3>
+                    <p>Interview a migrant worker, select vital metrics, and compile a high-density laminated health card.</p>
+                    <button class="action-btn">Issue New Card</button>
+                </div>
+
+                <!-- Action Card 2: Scan -->
+                <div class="action-card scan">
+                    <div class="action-card-icon">📷</div>
+                    <h3>Clinician Portal</h3>
+                    <p>Scan a worker's health card using a local phone camera. Instantly view patient history without database lookup.</p>
+                    <button class="action-btn">Open Scanner</button>
+                </div>
+            </div>
+
+            <!-- Technology Explanation -->
+            <div class="features-section">
+                <h3>The Nirantar Engine Technology</h3>
+                <div class="features-grid">
+                    <div class="feature-box">
+                        <h4>1. Compression Matrix</h4>
+                        <p>Stores records as tokenized variables (e.g. <code>DIA,HYP</code> for Diabetes and Hypertension) rather than verbose JSON to ensure the QR code stays scannable on standard phone cameras.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h4>2. AES Symmetrical Shield</h4>
+                        <p>Encrypts serialized tokens locally using AES-256 with a global key. Protects patient details from general public scans while remaining decryptable by any authorized scanner app.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h4>3. ABDM Alignment</h4>
+                        <p>Serves as a vital fail-safe, zero-network fallback for the Ayushman Bharat Digital Mission (ABHA), ensuring continuity in deep rural regions or high-transit construction camps.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GENERATOR VIEW -->
+        <div id="generator-view" class="view-container">
+            <div class="pane-layout">
+                <!-- Form Inputs -->
+                <div class="card-panel">
+                    <h3>Worker Medical Registry</h3>
+                    <form id="generation-form">
+                        
+                        <div class="form-group">
+                            <label for="worker-name">Full Name</label>
+                            <input type="text" id="worker-name" placeholder="e.g. Ram Kumar" required maxlength="30">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="worker-age">Age (Years)</label>
+                                <input type="number" id="worker-age" min="1" max="120" placeholder="34" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="worker-gender">Gender</label>
+                                <select id="worker-gender" required>
+                                    <option value="" disabled selected>Select</option>
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                    <option value="O">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="worker-blood">Blood Group</label>
+                            <select id="worker-blood" required>
+                                <option value="" disabled selected>Select Blood Group</option>
+                                <option value="A+">A-Positive (A+)</option>
+                                <option value="A-">A-Negative (A-)</option>
+                                <option value="B+">B-Positive (B+)</option>
+                                <option value="B-">B-Negative (B-)</option>
+                                <option value="AB+">AB-Positive (AB+)</option>
+                                <option value="AB-">AB-Negative (AB-)</option>
+                                <option value="O+">O-Positive (O+)</option>
+                                <option value="O-">O-Negative (O-)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Chronic Conditions</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="DIA"> Diabetes</label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="HYP"> Hypertension</label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="AST"> Asthma</label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="CAR"> Cardiac</label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="TB"> Tuberculosis</label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="EPI"> Epilepsy</label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="OTH"> Other</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="worker-allergies">High-Risk Allergies (Comma separated)</label>
+                            <input type="text" id="worker-allergies" placeholder="e.g. Penicillin, Sulfa Drugs, Latex" maxlength="50">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Recorded Vaccinations</label>
+                            <div style="display: grid; gap: 0.75rem; margin-top: 0.5rem;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 6px;">
+                                    <label class="checkbox-label" style="margin-bottom: 0; border: none; background: transparent;"><input type="checkbox" id="vaccine-tetanus"> Tetanus</label>
+                                    <select id="year-tetanus" style="width: 100px; padding: 0.25rem;">
+                                        <option value="2026">2026</option>
+                                        <option value="2025" selected>2025</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2023">2023</option>
+                                        <option value="2022">2022</option>
+                                    </select>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 6px;">
+                                    <label class="checkbox-label" style="margin-bottom: 0; border: none; background: transparent;"><input type="checkbox" id="vaccine-covid"> COVID-19</label>
+                                    <select id="year-covid" style="width: 100px; padding: 0.25rem;">
+                                        <option value="2025">2025</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2023">2023</option>
+                                        <option value="2022" selected>2022</option>
+                                        <option value="2021">2021</option>
+                                    </select>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 6px;">
+                                    <label class="checkbox-label" style="margin-bottom: 0; border: none; background: transparent;"><input type="checkbox" id="vaccine-bcg"> BCG</label>
+                                    <select id="year-bcg" style="width: 100px; padding: 0.25rem;">
+                                        <option value="2026">2026</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2024" selected>2024</option>
+                                        <option value="2023">2023</option>
+                                        <option value="2022">2022</option>
+                                    </select>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 6px;">
+                                    <label class="checkbox-label" style="margin-bottom: 0; border: none; background: transparent;"><input type="checkbox" id="vaccine-hepb"> Hepatitis B</label>
+                                    <select id="year-hepb" style="width: 100px; padding: 0.25rem;">
+                                        <option value="2026">2026</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2023" selected>2023</option>
+                                        <option value="2022">2022</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1.5rem;">Compile & Encrypt Health Card</button>
+                    </form>
+                </div>
+
+                <!-- Preview Display -->
+                <div class="card-panel preview-panel" id="card-preview-container" style="display: none;">
+                    <h3>Physical Card Preview</h3>
+                    
+                    <div class="id-card-frame" id="id-card-frame">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <h4>%PREVIEW_HEADER%</h4>
+                                <p>ABHA offline extensions</p>
+                            </div>
+                            <div style="font-size: 1.25rem;">🏥</div>
+                        </div>
+                        <div class="card-body-layout">
+                            <div class="card-details">
+                                <p style="font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem;" id="preview-name">Ram Kumar</p>
+                                <p><span>Age/Sex:</span> <strong id="preview-meta">Male | 34 Yrs</strong></p>
+                                <p><span>Blood Group:</span> <strong id="preview-blood" style="color: var(--accent-warning);">O-</strong></p>
+                                <p style="margin-top: 0.5rem; font-size: 0.7rem; color: var(--text-muted); line-height: 1.2;">This card stores encrypted, compressed medical history inside the QR. Scan using the Nirantar Health App completely offline.</p>
+                            </div>
+                            <div class="card-qr-container">
+                                <canvas id="qr-canvas"></canvas>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            Issued by Union Health Camp • Keep Card Laminated
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; width: 100%; justify-content: center;">
+                        <button id="download-card-btn" class="btn-primary">🖨️ Print Health Card</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCANNER VIEW -->
+        <div id="scanner-view" class="view-container">
+            <div class="pane-layout">
+                <!-- Camera view -->
+                <div class="card-panel">
+                    <h3>Symmetrical Card Reader</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Hold the health card QR up to your device camera to scan. The device will automatically decrypt and read the encrypted medical data locally.</p>
+                    
+                    <div class="scanner-container">
+                        <div id="reader"></div>
+                        <div class="scanner-overlay">
+                            <div class="scanner-frame"></div>
+                            <div class="scanner-laser"></div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                        <button id="start-scan-btn" class="btn-primary">📷 Start Webcam Stream</button>
+                        <button id="stop-scan-btn" class="btn-secondary" style="display: none;">⏹️ Stop Camera</button>
+                    </div>
+
+                    <!-- Scan fallback -->
+                    <div class="fallback-scanner">
+                        <p>No webcam? Upload a snapshot image of the QR Code card:</p>
+                        <div class="file-input-wrapper">
+                            <button class="btn-secondary">📁 Choose QR Image</button>
+                            <input type="file" id="qr-file-input" accept="image/*">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Decoded Patient File -->
+                <div class="card-panel" style="min-height: 380px;">
+                    <h3>Patient Ledger Record</h3>
+                    
+                    <!-- Neutral/Waiting state -->
+                    <div id="scanner-placeholder" style="text-align: center; color: var(--text-muted); padding: 5rem 0;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🔒</div>
+                        <p>Awaiting QR scan payload...</p>
+                        <p style="font-size: 0.75rem; margin-top: 0.5rem;">Align code in camera view or upload file above.</p>
+                    </div>
+
+                    <!-- Decoded Health Dashboard -->
+                    <div class="health-dashboard" id="health-dashboard">
+                        <div class="dashboard-header">
+                            <div class="patient-badge">
+                                <div class="patient-avatar" id="dash-avatar">R</div>
+                                <div class="patient-meta">
+                                    <h4 id="dash-name">Ram Kumar</h4>
+                                    <p id="dash-meta">Male • 34 Years Old</p>
+                                </div>
+                            </div>
+                            <div class="blood-group-badge" id="dash-blood">O-</div>
+                        </div>
+
+                        <div class="medical-grid">
+                            <div class="medical-card">
+                                <h5>Chronic Conditions</h5>
+                                <div class="condition-list" id="dash-conditions">
+                                    <span class="tag condition">Diabetes</span>
+                                    <span class="tag condition">Hypertension</span>
+                                </div>
+                            </div>
+
+                            <div class="medical-card">
+                                <h5>High-Risk Allergies</h5>
+                                <div class="allergy-list" id="dash-allergies">
+                                    <span class="tag allergy">⚠️ Penicillin</span>
+                                </div>
+                            </div>
+
+                            <div class="medical-card" style="grid-column: span 2;">
+                                <h5>Vaccination Ledger</h5>
+                                <div class="vaccine-list" id="dash-vaccines">
+                                    <span class="tag vaccine">✓ Tetanus (2025)</span>
+                                    <span class="tag vaccine">✓ COVID-19 (2022)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+                            <button id="reset-scan-btn" class="btn-secondary">Clear Record</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>Nirantar QR Offline Health Project • Built for Social Impact Hackathon • Powered by Ayushman Bharat Extension Framework</p>
+    </footer>
+
+    <script>
+        // REPLACE STATIC PATHS
+        // Nirantar Health Card - System Logic (100% Client-Side / Offline)
+
+        const CONFIG = {
+            SECRET_KEY: "NirantarHealthSecretKey2026",
+            VERSION: "V1"
+        };
+
+        // Vocabulary mappings for token compression
+        const DICTIONARY = {
+            conditions: {
+                'DIA': 'Diabetes',
+                'HYP': 'Hypertension',
+                'AST': 'Asthma',
+                'CAR': 'Cardiac Condition',
+                'TB':  'Tuberculosis',
+                'EPI': 'Epilepsy',
+                'OTH': 'Other Chronic Condition'
+            },
+            vaccines: {
+                'T': 'Tetanus',
+                'C': 'COVID-19',
+                'B': 'BCG (Tuberculosis)',
+                'H': 'Hepatitis B'
+            }
+        };
+
+        // State Variables
+        let html5QrCode = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Fix header title
+            document.querySelectorAll('h4').forEach(el => {
+                if(el.innerText === "%PREVIEW_HEADER%") {
+                    el.innerText = "NIRANTAR HEALTH CARD";
+                }
+            });
+
+            // Navigation setup
+            setupNavigation();
+            
+            // Generator setups
+            setupGenerator();
+            
+            // Scanner setups
+            setupScanner();
+        });
+
+        // Navigation Controller
+        function setupNavigation() {
+            const navButtons = document.querySelectorAll('.nav-btn');
+            const viewContainers = document.querySelectorAll('.view-container');
+            const actionCards = document.querySelectorAll('.action-card');
+
+            const switchView = (targetViewId) => {
+                // Toggle Nav Buttons
+                navButtons.forEach(btn => {
+                    if (btn.dataset.target === targetViewId) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+
+                // Toggle Views
+                viewContainers.forEach(container => {
+                    if (container.id === targetViewId) {
+                        container.classList.add('active');
+                    } else {
+                        container.classList.remove('active');
+                    }
+                });
+
+                // Handle camera scanner life cycle
+                if (targetViewId !== 'scanner-view') {
+                    stopScanning();
+                }
+            };
+
+            navButtons.forEach(btn => {
+                btn.addEventListener('click', () => switchView(btn.dataset.target));
+            });
+
+            actionCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const target = card.classList.contains('generate') ? 'generator-view' : 'scanner-view';
+                    switchView(target);
+                    if (target === 'scanner-view') {
+                        startScanning();
+                    }
+                });
+            });
+
+            // Airplane mode toggle simulation
+            const airplaneToggle = document.getElementById('airplane-toggle');
+            airplaneToggle.addEventListener('click', () => {
+                airplaneToggle.classList.toggle('active');
+                const active = airplaneToggle.classList.contains('active');
+                airplaneToggle.innerHTML = active ? '✈️ Offline Mode ACTIVE' : '🌐 Simulate Offline';
+                const indicator = document.querySelector('.status-bar');
+                if (active) {
+                    indicator.style.backgroundColor = 'rgba(244, 63, 94, 0.15)';
+                    indicator.style.borderBottomColor = 'rgba(244, 63, 94, 0.25)';
+                    indicator.querySelector('.status-dot').style.backgroundColor = 'var(--accent-warning)';
+                    indicator.querySelector('span').innerText = 'System Running in 100% Offline (Airplane Mode) - No Remote Logs';
+                } else {
+                    indicator.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
+                    indicator.style.borderBottomColor = 'rgba(16, 185, 129, 0.2)';
+                    indicator.querySelector('.status-dot').style.backgroundColor = 'var(--accent-success)';
+                    indicator.querySelector('span').innerText = 'System Running Offline (ABHA Last-Mile Sandbox)';
+                }
+            });
+        }
+
+        // ==========================================
+        // 🛠️ DATA COMPRESSION & ENCRYPTION ENGINE
+        // ==========================================
+
+        function compressData(profile) {
+            const name = profile.name.trim().replace(/\|/g, ''); 
+            const age = parseInt(profile.age) || 0;
+            const gender = profile.gender || 'O';
+            const blood = profile.bloodGroup || 'O+';
+            const condTokens = profile.conditions.join(',');
+            const allergies = profile.allergies.trim().toUpperCase().replace(/\|/g, '');
+            const vaccineTokens = profile.vaccines.map(v => `${v.code}${v.year}`).join(',');
+
+            const rawPayload = [
+                CONFIG.VERSION,
+                name,
+                age,
+                gender,
+                blood,
+                condTokens || 'NONE',
+                allergies || 'NONE',
+                vaccineTokens || 'NONE'
+            ].join('|');
+
+            const encrypted = CryptoJS.AES.encrypt(rawPayload, CONFIG.SECRET_KEY).toString();
+            return encrypted;
+        }
+
+        function decompressData(encryptedPayload) {
+            try {
+                const bytes = CryptoJS.AES.decrypt(encryptedPayload, CONFIG.SECRET_KEY);
+                const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
+                
+                if (!decryptedText || !decryptedText.startsWith(CONFIG.VERSION + '|')) {
+                    throw new Error("Invalid decryption");
+                }
+
+                const parts = decryptedText.split('|');
+                const [version, name, age, gender, blood, condTokens, allergyText, vaccineTokens] = parts;
+
+                const conditions = condTokens === 'NONE' ? [] : condTokens.split(',').map(token => {
+                    return DICTIONARY.conditions[token] || token;
+                });
+
+                const allergies = allergyText === 'NONE' ? [] : allergyText.split(',').map(s => s.trim());
+
+                const vaccines = vaccineTokens === 'NONE' ? [] : vaccineTokens.split(',').map(token => {
+                    const code = token.charAt(0);
+                    const yearStr = token.substring(1);
+                    const name = DICTIONARY.vaccines[code] || 'Unknown Vaccine';
+                    const year = '20' + yearStr;
+                    return { name, year };
+                });
+
+                return { name, age: parseInt(age), gender, bloodGroup: blood, conditions, allergies, vaccines };
+
+            } catch (e) {
+                console.error(e);
+                return null;
+            }
+        }
+
+        // ==========================================
+        // 💻 GENERATOR SCREEN LOGIC
+        // ==========================================
+
+        function setupGenerator() {
+            const form = document.getElementById('generation-form');
+            const qrCanvas = document.getElementById('qr-canvas');
+            const downloadBtn = document.getElementById('download-card-btn');
+            
+            const inputs = ['worker-name', 'worker-age', 'worker-gender', 'worker-blood'];
+            inputs.forEach(id => {
+                document.getElementById(id).addEventListener('input', updateCardPreviewText);
+            });
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const name = document.getElementById('worker-name').value;
+                const age = document.getElementById('worker-age').value;
+                const gender = document.getElementById('worker-gender').value;
+                const bloodGroup = document.getElementById('worker-blood').value;
+
+                const conditions = [];
+                document.querySelectorAll('input[name="conditions"]:checked').forEach(cb => {
+                    conditions.push(cb.value);
+                });
+
+                const allergies = document.getElementById('worker-allergies').value;
+
+                const vaccines = [];
+                const vaccineCheckboxes = [
+                    { id: 'vaccine-tetanus', code: 'T', yearId: 'year-tetanus' },
+                    { id: 'vaccine-covid', code: 'C', yearId: 'year-covid' },
+                    { id: 'vaccine-bcg', code: 'B', yearId: 'year-bcg' },
+                    { id: 'vaccine-hepb', code: 'H', yearId: 'year-hepb' }
+                ];
+
+                vaccineCheckboxes.forEach(v => {
+                    if (document.getElementById(v.id).checked) {
+                        const yearVal = document.getElementById(v.yearId).value;
+                        const shortYear = yearVal.slice(-2); 
+                        vaccines.push({ code: v.code, year: shortYear });
+                    }
+                });
+
+                const profile = { name, age, gender, bloodGroup, conditions, allergies, vaccines };
+                const encrypted = compressData(profile);
+
+                QRCode.toCanvas(qrCanvas, encrypted, {
+                    width: 140,
+                    margin: 1,
+                    errorCorrectionLevel: 'M',
+                    color: { dark: '#0f172a', light: '#ffffff' }
+                }, (error) => {
+                    if (error) {
+                        alert(error.message);
+                        return;
+                    }
+                    document.getElementById('card-preview-container').style.display = 'block';
+                    document.getElementById('card-preview-container').scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                window.print();
+            });
+        }
+
+        function updateCardPreviewText() {
+            const name = document.getElementById('worker-name').value || "Worker Name";
+            const age = document.getElementById('worker-age').value || "--";
+            const gender = document.getElementById('worker-gender').value || "-";
+            const blood = document.getElementById('worker-blood').value || "--";
+
+            document.getElementById('preview-name').innerText = name;
+            document.getElementById('preview-meta').innerText = `${gender} | ${age} Years`;
+            document.getElementById('preview-blood').innerText = blood;
+        }
+
+        // ==========================================
+        // 🎥 CAMERA SCANNER LOGIC
+        // ==========================================
+
+        function setupScanner() {
+            const startScanBtn = document.getElementById('start-scan-btn');
+            const stopScanBtn = document.getElementById('stop-scan-btn');
+            const fileInput = document.getElementById('qr-file-input');
+            const resetScanBtn = document.getElementById('reset-scan-btn');
+
+            startScanBtn.addEventListener('click', startScanning);
+            stopScanBtn.addEventListener('click', stopScanning);
+            resetScanBtn.addEventListener('click', resetScannerUI);
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length === 0) return;
+                const file = e.target.files[0];
+                
+                if (!html5QrCode) {
+                    html5QrCode = new Html5Qrcode("reader");
+                }
+
+                html5QrCode.scanFile(file, true)
+                    .then(qrCodeMessage => {
+                        handleScanSuccess(qrCodeMessage);
+                    })
+                    .catch(err => {
+                        alert("Failed to decode QR. Ensure it is a clear QR image.");
+                    });
+            });
+        }
+
+        function startScanning() {
+            resetScannerUI();
+            document.getElementById('start-scan-btn').style.display = 'none';
+            document.getElementById('stop-scan-btn').style.display = 'inline-block';
+            document.querySelector('.scanner-laser').style.display = 'block';
+
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("reader");
+            }
+
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            
+            html5QrCode.start(
+                { facingMode: "environment" },
+                config,
+                (decodedText) => {
+                    stopScanning();
+                    handleScanSuccess(decodedText);
+                },
+                (errorMessage) => {}
+            ).catch(err => {
+                alert("Webcam scanner block on direct files. Please use the 'Choose QR Image' button below to select a photo of the card QR.");
+                stopScanning();
+            });
+        }
+
+        function stopScanning() {
+            document.getElementById('start-scan-btn').style.display = 'inline-block';
+            document.getElementById('stop-scan-btn').style.display = 'none';
+            document.querySelector('.scanner-laser').style.display = 'none';
+
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then(() => {}).catch(err => {});
+            }
+        }
+
+        function handleScanSuccess(payload) {
+            const decryptedProfile = decompressData(payload);
+
+            if (!decryptedProfile) {
+                alert("🚨 Security Alert: Decryption failed. Invalid QR code key.");
+                resetScannerUI();
+                return;
+            }
+
+            document.getElementById('dash-avatar').innerText = decryptedProfile.name.charAt(0).toUpperCase();
+            document.getElementById('dash-name').innerText = decryptedProfile.name;
+            
+            const genderLabels = { 'M': 'Male', 'F': 'Female', 'O': 'Other' };
+            const genderFull = genderLabels[decryptedProfile.gender] || 'Other';
+            document.getElementById('dash-meta').innerText = `${genderFull} • ${decryptedProfile.age} Years Old`;
+            document.getElementById('dash-blood').innerText = decryptedProfile.bloodGroup;
+
+            const conditionsContainer = document.getElementById('dash-conditions');
+            conditionsContainer.innerHTML = '';
+            if (decryptedProfile.conditions.length === 0) {
+                conditionsContainer.innerHTML = '<span class="tag none">No Known Chronic Conditions</span>';
+            } else {
+                decryptedProfile.conditions.forEach(c => {
+                    conditionsContainer.innerHTML += `<span class="tag condition">${c}</span>`;
+                });
+            }
+
+            const allergiesContainer = document.getElementById('dash-allergies');
+            allergiesContainer.innerHTML = '';
+            if (decryptedProfile.allergies.length === 0) {
+                allergiesContainer.innerHTML = '<span class="tag none">No Known Medical Allergies</span>';
+            } else {
+                decryptedProfile.allergies.forEach(a => {
+                    allergiesContainer.innerHTML += `<span class="tag allergy">⚠️ ${a}</span>`;
+                });
+            }
+
+            const vaccinesContainer = document.getElementById('dash-vaccines');
+            vaccinesContainer.innerHTML = '';
+            if (decryptedProfile.vaccines.length === 0) {
+                vaccinesContainer.innerHTML = '<span class="tag none">No Recorded Vaccinations</span>';
+            } else {
+                decryptedProfile.vaccines.forEach(v => {
+                    vaccinesContainer.innerHTML += `<span class="tag vaccine">✓ ${v.name} (${v.year})</span>`;
+                });
+            }
+
+            const dashboard = document.getElementById('health-dashboard');
+            dashboard.classList.add('active');
+            dashboard.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetScannerUI() {
+            document.getElementById('health-dashboard').classList.remove('active');
+            document.getElementById('qr-file-input').value = '';
+        }
+    </script>
+</body>
+</html>

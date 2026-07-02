@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nirantar Health Card - Offline QR Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Cryptography Library (AES) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" integrity="sha512-E8QSvWZ0GeFmRmqXSxAT6m54641ECGlCFOPhyRTFODyRJ58SMLVYojgqRYgG1S142FMv62O5OCB290QqNDccMw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- QR Code Compiler Library (Canvas) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.1/qrcode.min.js" integrity="sha512-c2e7rrlPjJd+n22H2N5Fphg1F2Kx3T06s53Rkh9npi32Wj+zQ46YVnS68V95c479W1U48vT9JjDq3K3Z1aCgkg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- HTML5 QR Code Scanner Library (Camera) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js" integrity="sha512-r6rDA7W6ZeQhvl8S7yRV0VUur54gUNfyNyCXHB3CD3vEGsd0vV/gFzzgQLyXbSQ/+5Wy/kLoFEsLSU11SnhM1A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+
+    <!-- Header containing logo and navigation tabs -->
+    <header>
+        <div class="header-container">
+            <div class="logo-section">
+                <div class="logo-icon">N</div>
+                <div class="logo-text">
+                    <h1>Nirantar Health</h1>
+                    <p>Offline Health Continuity Portal</p>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <button class="nav-btn active" data-target="dashboard-view">Dashboard</button>
+                <button class="nav-btn" data-target="generator-view">Card Generator</button>
+                <button class="nav-btn" data-target="scanner-view">Card Scanner</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Network state notification bar -->
+    <div class="status-bar">
+        <div class="status-dot"></div>
+        <span>System Running Offline (ABHA Last-Mile Sandbox)</span>
+        <button class="airplane-toggle" id="airplane-toggle">🌐 Simulate Offline</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <main>
+        
+        <!-- DASHBOARD VIEW -->
+        <div id="dashboard-view" class="view-container active">
+            <div class="hero-section">
+                <h2>Zero-Connectivity Patient Ledger</h2>
+                <p>Nirantar QR compresses vital medical data, encrypts it, and embeds it directly into the pixels of a QR code. Healthcare clinics can scan, decrypt, and read worker records completely offline.</p>
+            </div>
+
+            <div class="action-grid">
+                <!-- Action Card 1: Generate -->
+                <div class="action-card generate">
+                    <div class="action-card-icon">📋</div>
+                    <h3>Volunteer Portal</h3>
+                    <p>Interview a migrant worker, select vital metrics, and compile a high-density laminated health card.</p>
+                    <button class="action-btn">Issue New Card</button>
+                </div>
+
+                <!-- Action Card 2: Scan -->
+                <div class="action-card scan">
+                    <div class="action-card-icon">📷</div>
+                    <h3>Clinician Portal</h3>
+                    <p>Scan a worker's health card using a local phone camera. Instantly view patient history without database lookup.</p>
+                    <button class="action-btn">Open Scanner</button>
+                </div>
+            </div>
+
+            <!-- Technology Explanation -->
+            <div class="features-section">
+                <h3>The Nirantar Engine Technology</h3>
+                <div class="features-grid">
+                    <div class="feature-box">
+                        <h4>1. Compression Matrix</h4>
+                        <p>Stores records as tokenized variables (e.g. <code>DIA,HYP</code> for Diabetes and Hypertension) rather than verbose JSON to ensure the QR code stays scannable on standard phone cameras.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h4>2. AES Symmetrical Shield</h4>
+                        <p>Encrypts serialized tokens locally using AES-256 with a global key. Protects patient details from general public scans while remaining decryptable by any authorized scanner app.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h4>3. ABDM Alignment</h4>
+                        <p>Serves as a vital fail-safe, zero-network fallback for the Ayushman Bharat Digital Mission (ABHA), ensuring continuity in deep rural regions or high-transit construction camps.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GENERATOR VIEW -->
+        <div id="generator-view" class="view-container">
+            <div class="pane-layout">
+                <!-- Form Inputs -->
+                <div class="card-panel">
+                    <h3>Worker Medical Registry</h3>
+                    <form id="generation-form">
+                        
+                        <div class="form-group">
+                            <label for="worker-name">Full Name</label>
+                            <input type="text" id="worker-name" placeholder="e.g. Ram Kumar" required maxlength="30">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="worker-age">Age (Years)</label>
+                                <input type="number" id="worker-age" min="1" max="120" placeholder="34" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="worker-gender">Gender</label>
+                                <select id="worker-gender" required>
+                                    <option value="" disabled selected>Select</option>
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                    <option value="O">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="worker-blood">Blood Group</label>
+                            <select id="worker-blood" required>
+                                <option value="" disabled selected>Select Blood Group</option>
+                                <option value="A+">A-Positive (A+)</option>
+                                <option value="A-">A-Negative (A-)</option>
+                                <option value="B+">B-Positive (B+)</option>
+                                <option value="B-">B-Negative (B-)</option>
+                                <option value="AB+">AB-Positive (AB+)</option>
+                                <option value="AB-">AB-Negative (AB-)</option>
+                                <option value="O+">O-Positive (O+)</option>
+                                <option value="O-">O-Negative (O-)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Chronic Conditions</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="DIA"> Diabetes</label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="HYP"> Hypertension</label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="AST"> Asthma</label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="CAR"> Cardiac</label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="TB"> Tuberculosis</label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="EPI"> Epilepsy</label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="OTH"> Other</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="worker-allergies">High-Risk Allergies (Comma separated)</label>
+                            <input type="text" id="worker-allergies" placeholder="e.g. Penicillin, Sulfa Drugs, Latex" maxlength="50">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Recorded Vaccinations</label>
+                            <div style="display: grid; gap: 0.75rem; margin-top: 0.5rem;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 6px;">
+                                    <label class="checkbox-label" style="margin-bottom: 0; border: none; background: transparent;"><input type="checkbox" id="vaccine-tetanus"> Tetanus</label>
+                                    <select id="year-tetanus" style="width: 100px; padding: 0.25rem;">
+                                        <option value="2026">2026</option>
+                                        <option value="2025" selected>2025</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2023">2023</option>
+                                        <option value="2022">2022</option>
+                                    </select>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 6px;">
+                                    <label class="checkbox-label" style="margin-bottom: 0; border: none; background: transparent;"><input type="checkbox" id="vaccine-covid"> COVID-19</label>
+                                    <select id="year-covid" style="width: 100px; padding: 0.25rem;">
+                                        <option value="2025">2025</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2023">2023</option>
+                                        <option value="2022" selected>2022</option>
+                                        <option value="2021">2021</option>
+                                    </select>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 6px;">
+                                    <label class="checkbox-label" style="margin-bottom: 0; border: none; background: transparent;"><input type="checkbox" id="vaccine-bcg"> BCG</label>
+                                    <select id="year-bcg" style="width: 100px; padding: 0.25rem;">
+                                        <option value="2026">2026</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2024" selected>2024</option>
+                                        <option value="2023">2023</option>
+                                        <option value="2022">2022</option>
+                                    </select>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 6px;">
+                                    <label class="checkbox-label" style="margin-bottom: 0; border: none; background: transparent;"><input type="checkbox" id="vaccine-hepb"> Hepatitis B</label>
+                                    <select id="year-hepb" style="width: 100px; padding: 0.25rem;">
+                                        <option value="2026">2026</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2023" selected>2023</option>
+                                        <option value="2022">2022</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1.5rem;">Compile & Encrypt Health Card</button>
+                    </form>
+                </div>
+
+                <!-- Preview Display -->
+                <div class="card-panel preview-panel" id="card-preview-container" style="display: none;">
+                    <h3>Physical Card Preview</h3>
+                    
+                    <div class="id-card-frame" id="id-card-frame">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <h4>NIRANTAR HEALTH CARD</h4>
+                                <p>ABHA offline extensions</p>
+                            </div>
+                            <div style="font-size: 1.25rem;">🏥</div>
+                        </div>
+                        <div class="card-body-layout">
+                            <div class="card-details">
+                                <p style="font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem;" id="preview-name">Ram Kumar</p>
+                                <p><span>Age/Sex:</span> <strong id="preview-meta">Male | 34 Yrs</strong></p>
+                                <p><span>Blood Group:</span> <strong id="preview-blood" style="color: var(--accent-warning);">O-</strong></p>
+                                <p style="margin-top: 0.5rem; font-size: 0.7rem; color: var(--text-muted); line-height: 1.2;">This card stores encrypted, compressed medical history inside the QR. Scan using the Nirantar Health App completely offline.</p>
+                            </div>
+                            <div class="card-qr-container">
+                                <canvas id="qr-canvas"></canvas>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            Issued by Union Health Camp • Keep Card Laminated
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; width: 100%; justify-content: center;">
+                        <button id="download-card-btn" class="btn-primary">🖨️ Print Health Card</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCANNER VIEW -->
+        <div id="scanner-view" class="view-container">
+            <div class="pane-layout">
+                <!-- Camera view -->
+                <div class="card-panel">
+                    <h3>Symmetrical Card Reader</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Hold the health card QR up to your device camera to scan. The device will automatically decrypt and read the encrypted medical data locally.</p>
+                    
+                    <div class="scanner-container">
+                        <div id="reader"></div>
+                        <div class="scanner-overlay">
+                            <div class="scanner-frame"></div>
+                            <div class="scanner-laser"></div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                        <button id="start-scan-btn" class="btn-primary">📷 Start Webcam Stream</button>
+                        <button id="stop-scan-btn" class="btn-secondary" style="display: none;">⏹️ Stop Camera</button>
+                    </div>
+
+                    <!-- Scan fallback -->
+                    <div class="fallback-scanner">
+                        <p>No webcam? Upload a snapshot image of the QR Code card:</p>
+                        <div class="file-input-wrapper">
+                            <button class="btn-secondary">📁 Choose QR Image</button>
+                            <input type="file" id="qr-file-input" accept="image/*">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Decoded Patient File -->
+                <div class="card-panel" style="min-height: 380px;">
+                    <h3>Patient Ledger Record</h3>
+                    
+                    <!-- Neutral/Waiting state -->
+                    <div id="scanner-placeholder" style="text-align: center; color: var(--text-muted); padding: 5rem 0;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🔒</div>
+                        <p>Awaiting QR scan payload...</p>
+                        <p style="font-size: 0.75rem; margin-top: 0.5rem;">Align code in camera view or upload file above.</p>
+                    </div>
+
+                    <!-- Decoded Health Dashboard -->
+                    <div class="health-dashboard" id="health-dashboard">
+                        <div class="dashboard-header">
+                            <div class="patient-badge">
+                                <div class="patient-avatar" id="dash-avatar">R</div>
+                                <div class="patient-meta">
+                                    <h4 id="dash-name">Ram Kumar</h4>
+                                    <p id="dash-meta">Male • 34 Years Old</p>
+                                </div>
+                            </div>
+                            <div class="blood-group-badge" id="dash-blood">O-</div>
+                        </div>
+
+                        <div class="medical-grid">
+                            <div class="medical-card">
+                                <h5>Chronic Conditions</h5>
+                                <div class="condition-list" id="dash-conditions">
+                                    <span class="tag condition">Diabetes</span>
+                                    <span class="tag condition">Hypertension</span>
+                                </div>
+                            </div>
+
+                            <div class="medical-card">
+                                <h5>High-Risk Allergies</h5>
+                                <div class="allergy-list" id="dash-allergies">
+                                    <span class="tag allergy">⚠️ Penicillin</span>
+                                </div>
+                            </div>
+
+                            <div class="medical-card" style="grid-column: span 2;">
+                                <h5>Vaccination Ledger</h5>
+                                <div class="vaccine-list" id="dash-vaccines">
+                                    <span class="tag vaccine">✓ Tetanus (2025)</span>
+                                    <span class="tag vaccine">✓ COVID-19 (2022)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+                            <button id="reset-scan-btn" class="btn-secondary">Clear Record</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>Nirantar QR Offline Health Project • Built for Social Impact Hackathon • Powered by Ayushman Bharat Extension Framework</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
