@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nirantar QR - Pitch Deck</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body.presentation-mode {
+            background: radial-gradient(circle at center, #1e293b 0%, #090d16 100%);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: var(--text-main);
+            font-family: var(--font-sans);
+        }
+
+        .deck-container {
+            width: 90vw;
+            height: 80vh;
+            max-width: 1280px;
+            max-height: 720px;
+            position: relative;
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            padding: 3rem 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            opacity: 0;
+            transform: translateX(100px);
+            transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            box-sizing: border-box;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        .slide.prev {
+            transform: translateX(-100px);
+        }
+
+        /* Slide Content Components */
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .slide-category {
+            font-size: 0.8rem;
+            color: var(--accent-success);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-weight: 600;
+        }
+
+        .slide-num {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .slide-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .slide-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            max-width: 800px;
+            line-height: 1.5;
+        }
+
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+        }
+
+        /* Split layouts on slides */
+        .slide-split {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .slide-bullets {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .bullet-item {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .bullet-icon {
+            width: 28px;
+            height: 28px;
+            background: rgba(14, 165, 233, 0.15);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-primary);
+            flex-shrink: 0;
+            font-size: 0.9rem;
+        }
+
+        .bullet-text h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .bullet-text p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Table design */
+        .slide-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .slide-table th {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .slide-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .slide-table code {
+            background: rgba(0,0,0,0.3);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            color: var(--accent-success);
+        }
+
+        /* Interactive controls overlay */
+        .deck-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .control-btn:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 15px var(--accent-primary-glow);
+        }
+
+        .deck-indicators {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .indicator {
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .indicator.active {
+            background: var(--accent-primary);
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .keyboard-tip {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body class="presentation-mode">
+
+    <!-- Interactive Slideshow Container -->
+    <div class="deck-container">
+        
+        <!-- SLIDE 1: Title Slide -->
+        <div class="slide active">
+            <div class="slide-header">
+                <span class="slide-category">Hackathon Pitch Deck</span>
+                <span class="slide-num">01 / 06</span>
+            </div>
+            <div class="slide-body" style="text-align: center; align-items: center;">
+                <div class="logo-icon" style="width: 80px; height: 80px; font-size: 2.5rem; margin-bottom: 1.5rem; border-radius: 20px;">N</div>
+                <h1 class="slide-title" style="font-size: 3.5rem;">Nirantar Health Card</h1>
+                <p class="slide-subtitle" style="text-align: center;">Continuous, Zero-Connectivity Health Continuity Ledger for Migrant Workers</p>
+                <div style="margin-top: 1rem; color: var(--accent-success); font-weight: 500; font-size: 0.95rem; letter-spacing: 0.05em; text-transform: uppercase;">
+                    Last-Mile Fallback Integration for ABHA
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Problem Statement: Healthcare Disruption in Nomad Populations</span>
+                <span>Press Space or Arrow Keys to Navigate</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: The Problem -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-category">The Crisis</span>
+                <span class="slide-num">02 / 06</span>
+            </div>
+            <div class="slide-body">
+                <div class="slide-split">
+                    <div class="slide-bullets">
+                        <h2 class="slide-title">The Health Continuity Gap</h2>
+                        <div class="bullet-item">
+                            <div class="bullet-icon">✗</div>
+                            <div class="bullet-text">
+                                <h4>Medical History Reset</h4>
+                                <p>Migrant workers lose paper prescriptions, medical logs, and diagnosis records during seasonal travel between states.</p>
+                            </div>
+                        </div>
+                        <div class="bullet-item">
+                            <div class="bullet-icon">✗</div>
+                            <div class="bullet-text">
+                                <h4>Connectivity Blindspots</h4>
+                                <p>Deep rural clinics, remote construction sectors, and transit camps lack stable, high-speed cellular networks.</p>
+                            </div>
+                        </div>
+                        <div class="bullet-item">
+                            <div class="bullet-icon">✗</div>
+                            <div class="bullet-text">
+                                <h4>High-Risk Emergency Threats</h4>
+                                <p>Without records, doctors in new locations inadvertently prescribe drugs conflicting with unknown critical allergies.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background: rgba(244, 63, 94, 0.05); border: 1px dashed var(--accent-warning); padding: 2rem; border-radius: 16px; text-align: center;">
+                        <span style="font-size: 3rem;">💔</span>
+                        <h3 style="color: var(--accent-warning); margin: 1rem 0 0.5rem 0; font-size: 1.5rem;">The Status Quo</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">Every relocation wipes the patient's record clean. Chronic treatments (Tuberculosis, Diabetes) reset, raising morbidity risks.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Target Impact: 500M+ Migrant and Informal Workers</span>
+                <span>Nirantar Health Deck</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: The Solution -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-category">The Innovation</span>
+                <span class="slide-num">03 / 06</span>
+            </div>
+            <div class="slide-body">
+                <div class="slide-split">
+                    <div class="slide-bullets">
+                        <h2 class="slide-title">100% Offline Decentralized Card</h2>
+                        <div class="bullet-item">
+                            <div class="bullet-icon">✓</div>
+                            <div class="bullet-text">
+                                <h4>Embedded in the Pixels</h4>
+                                <p>No database lookups, cloud servers, or API calls. All critical health data is written directly into the physical QR grid.</p>
+                            </div>
+                        </div>
+                        <div class="bullet-item">
+                            <div class="bullet-icon">✓</div>
+                            <div class="bullet-text">
+                                <h4>Client-Side Decryption</h4>
+                                <p>Web-based scanner app operates in airplane mode. Runs decryption locally via shared clinic credentials.</p>
+                            </div>
+                        </div>
+                        <div class="bullet-item">
+                            <div class="bullet-icon">✓</div>
+                            <div class="bullet-text">
+                                <h4>Thermal Printer Friendly</h4>
+                                <p>Designed for low-cost, immediate physical lamination at worker labor unions and rural health centers.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid var(--accent-success); padding: 2rem; border-radius: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                        <span style="font-size: 2.5rem;">📱</span>
+                        <h3 style="color: var(--accent-success); font-size: 1.25rem; margin: 0;">Offline Reader Demo</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">Doctors scan the card in deep forest belts or cellular dead zones, extracting full dossiers instantly.</p>
+                        <a href="index.html" class="btn-primary" style="text-decoration: none; padding: 0.5rem 1rem; font-size: 0.8rem;">Open Live App Portal</a>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Zero Database. Zero API Calls. 100% Resilience.</span>
+                <span>Nirantar Health Deck</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: Data Compression Architecture -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-category">Architecture</span>
+                <span class="slide-num">04 / 06</span>
+            </div>
+            <div class="slide-body">
+                <h2 class="slide-title" style="margin-bottom: 0.5rem;">Tokenized Compression System</h2>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">Standard JSON text is too bulky for a QR code. We map fields to tiny, standardized tokens to minimize pixels.</p>
+                
+                <table class="slide-table">
+                    <thead>
+                        <tr>
+                            <th>Medical Field</th>
+                            <th>Uncompressed Standard (JSON)</th>
+                            <th>Nirantar Compressed Token</th>
+                            <th>Bytes Saved</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Demographics</strong></td>
+                            <td><code>{"name":"Ram Kumar", "age":34, "gender":"M"}</code></td>
+                            <td><code>Ram Kumar|34|M</code></td>
+                            <td>~60%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Blood Group</strong></td>
+                            <td><code>"O-Negative"</code></td>
+                            <td><code>O-</code></td>
+                            <td>~85%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Chronic Diseases</strong></td>
+                            <td><code>["Diabetes", "Hypertension"]</code></td>
+                            <td><code>DIA,HYP</code></td>
+                            <td>~75%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vaccinations</strong></td>
+                            <td><code>{"Tetanus": 2025, "Covid": 2022}</code></td>
+                            <td><code>T25,C22</code></td>
+                            <td>~70%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(14, 165, 233, 0.05); border: 1px solid rgba(14, 165, 233, 0.15); border-radius: 8px; font-size: 0.8rem; text-align: center; font-family: monospace; color: var(--accent-primary);">
+                    Serialized Pipeline: V1|Ram Kumar|34|M|O-|DIA,HYP|PCN|T25,C22
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Minimizes QR version footprint to level 5 (37x37 grid) for optimal low-light scanning</span>
+                <span>Nirantar Health Deck</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: Security Protocol -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-category">Security & Verification</span>
+                <span class="slide-num">05 / 06</span>
+            </div>
+            <div class="slide-body">
+                <div class="slide-split">
+                    <div class="slide-bullets">
+                        <h2 class="slide-title">Local Symmetrical Encryption</h2>
+                        <div class="bullet-item">
+                            <div class="bullet-icon">🔒</div>
+                            <div class="bullet-text">
+                                <h4>AES-256 Symmetrical Shield</h4>
+                                <p>The serialized medical string is encrypted before compiling into QR pixels. Private health information cannot be read by commercial camera scanners.</p>
+                            </div>
+                        </div>
+                        <div class="bullet-item">
+                            <div class="bullet-icon">🔑</div>
+                            <div class="bullet-text">
+                                <h4>Universal Clinic Secret</h4>
+                                <p>Authorized health workers log in once to save the decryption token locally. Scanner automatically decrypts scanning feeds on-the-fly.</p>
+                            </div>
+                        </div>
+                        <div class="bullet-item">
+                            <div class="bullet-icon">💾</div>
+                            <div class="bullet-text">
+                                <h4>Worker Sovereignty</h4>
+                                <p>No central record database exists that can leak credentials. The worker owns the physical card containing their only record copy.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 16px;">
+                        <h4 style="color: var(--accent-primary); margin-bottom: 0.75rem; font-size: 1rem;">Scanning Protocol Flow</h4>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.8rem; color: var(--text-muted);">
+                            <div style="display: flex; gap: 0.5rem;"><div style="color:var(--accent-success)">1</div><div>Scan encrypted QR code via HTML5 Reader</div></div>
+                            <div style="display: flex; gap: 0.5rem;"><div style="color:var(--accent-success)">2</div><div>Extract AES ciphertext from image pixels</div></div>
+                            <div style="display: flex; gap: 0.5rem;"><div style="color:var(--accent-success)">3</div><div>Decrypt locally using stored shared secret</div></div>
+                            <div style="display: flex; gap: 0.5rem;"><div style="color:var(--accent-success)">4</div><div>Parse tokens and render full patient chart</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Complies with HIPPA principles: absolute patient data ownership</span>
+                <span>Nirantar Health Deck</span>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: ABDM Alignment & Conclusion -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="slide-category">Social Impact</span>
+                <span class="slide-num">06 / 06</span>
+            </div>
+            <div class="slide-body">
+                <div class="slide-split">
+                    <div class="slide-bullets">
+                        <h2 class="slide-title">Fail-Safe Extension for ABDM</h2>
+                        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">India's central digital health systems (ABHA/ABDM) perform wonderfully in connected metropolitan hubs, but require internet APIs and live OTP validations.</p>
+                        <div class="bullet-item">
+                            <div class="bullet-icon">⚡</div>
+                            <div class="bullet-text">
+                                <h4>Bridging the Last Mile</h4>
+                                <p>Nirantar QR acts as the zero-network extension. When the central network goes down, health operations continue seamlessly.</p>
+                            </div>
+                        </div>
+                        <div class="bullet-item">
+                            <div class="bullet-icon">🎯</div>
+                            <div class="bullet-text">
+                                <h4>Low-Cost Lamination</h4>
+                                <p>Volunteers can issue cards at high-transit railway stations, trade union sites, and remote construction zones.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(14,165,233,0.1) 0%, rgba(16,185,129,0.1) 100%); border: 1px solid rgba(16, 185, 129, 0.3); padding: 2rem; border-radius: 16px; text-align: center;">
+                        <h3 style="color: var(--accent-success); font-size: 1.5rem; margin-bottom: 0.5rem;">Why We Win</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.25rem;">A simple, working, highly-optimized physical card that keeps vital details secure and decryptable anywhere, instantly, completely offline.</p>
+                        <a href="index.html" class="btn-primary" style="text-decoration: none; width: 100%;">Launch Portal App</a>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Created for Social Impact Hackathon • Nirantar Health Project</span>
+                <span>Thank You!</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Slide Control Overlay -->
+    <div class="deck-controls">
+        <button class="control-btn" id="prev-btn">◀</button>
+        <div class="deck-indicators" id="indicators-container"></div>
+        <button class="control-btn" id="next-btn">▶</button>
+        <div class="keyboard-tip">Use ← / → Arrow Keys</div>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const indicatorsContainer = document.getElementById('indicators-container');
+        let currentSlideIdx = 0;
+
+        // Build indicators dynamically
+        slides.forEach((_, idx) => {
+            const ind = document.createElement('div');
+            ind.classList.add('indicator');
+            if (idx === 0) ind.classList.add('active');
+            ind.addEventListener('click', () => showSlide(idx));
+            indicatorsContainer.appendChild(ind);
+        });
+
+        const indicators = document.querySelectorAll('.indicator');
+
+        function showSlide(index) {
+            // Handle limits
+            if (index < 0) index = 0;
+            if (index >= slides.length) index = slides.length - 1;
+
+            slides.forEach((slide, idx) => {
+                slide.classList.remove('active', 'prev');
+                if (idx < index) {
+                    slide.classList.add('prev');
+                }
+                if (idx === index) {
+                    slide.classList.add('active');
+                }
+            });
+
+            indicators.forEach((ind, idx) => {
+                if (idx === index) {
+                    ind.classList.add('active');
+                } else {
+                    ind.classList.remove('active');
+                }
+            });
+
+            currentSlideIdx = index;
+        }
+
+        prevBtn.addEventListener('click', () => {
+            showSlide(currentSlideIdx - 1);
+        });
+
+        nextBtn.addEventListener('click', () => {
+            showSlide(currentSlideIdx + 1);
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                showSlide(currentSlideIdx + 1);
+            } else if (e.key === 'ArrowLeft') {
+                showSlide(currentSlideIdx - 1);
+            }
+        });
+    </script>
+</body>
+</html>

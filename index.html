@@ -3,14 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nirantar Health Card - Offline QR Portal</title>
+    <title>Nirantar Health - Mobile Offline Health Continuity Portal</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Cryptography Library (AES) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" integrity="sha512-E8QSvWZ0GeFmRmqXSxAT6m54641ECGlCFOPhyRTFODyRJ58SMLVYojgqRYgG1S142FMv62O5OCB290QqNDccMw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d9488">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Cryptography Library (AES, PBKDF2, HMAC) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <!-- QR Code Compiler Library (Canvas) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.1/qrcode.min.js" integrity="sha512-c2e7rrlPjJd+n22H2N5Fphg1F2Kx3T06s53Rkh9npi32Wj+zQ46YVnS68V95c479W1U48vT9JjDq3K3Z1aCgkg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.1/qrcode.min.js"></script>
     <!-- HTML5 QR Code Scanner Library (Camera) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js" integrity="sha512-r6rDA7W6ZeQhvl8S7yRV0VUur54gUNfyNyCXHB3CD3vEGsd0vV/gFzzgQLyXbSQ/+5Wy/kLoFEsLSU11SnhM1A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
 
@@ -20,23 +24,36 @@
             <div class="logo-section">
                 <div class="logo-icon">N</div>
                 <div class="logo-text">
-                    <h1>Nirantar Health</h1>
-                    <p>Offline Health Continuity Portal</p>
+                    <h1 data-key="title">Nirantar Health</h1>
+                    <p data-key="tagline">Offline Health Continuity Portal</p>
                 </div>
             </div>
             <nav class="nav-links">
-                <button class="nav-btn active" data-target="dashboard-view">Dashboard</button>
-                <button class="nav-btn" data-target="generator-view">Card Generator</button>
-                <button class="nav-btn" data-target="scanner-view">Card Scanner</button>
+                <button class="nav-btn active" data-target="dashboard-view" data-key="nav-dashboard">Dashboard</button>
+                <button class="nav-btn" data-target="generator-view" data-key="nav-generator">Card Generator</button>
+                <button class="nav-btn" data-target="scanner-view" data-key="nav-scanner">Card Scanner</button>
             </nav>
+            <div class="header-controls">
+                <!-- PWA Install Button -->
+                <button id="pwa-install-btn" class="install-btn" style="display: none;" aria-label="Install Application">📥 Install App</button>
+                <!-- Language Selector -->
+                <select id="lang-select" class="lang-dropdown" aria-label="Language Selector">
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                    <option value="bn">বাংলা (Bengali)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                    <option value="te">తెలుగు (Telugu)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                </select>
+            </div>
         </div>
     </header>
 
     <!-- Network state notification bar -->
     <div class="status-bar">
         <div class="status-dot"></div>
-        <span>System Running Offline (ABHA Last-Mile Sandbox)</span>
-        <button class="airplane-toggle" id="airplane-toggle">🌐 Simulate Offline</button>
+        <span id="network-status-text" data-key="status-offline-sandbox">System Running Offline (ABHA Last-Mile Sandbox)</span>
+        <button class="airplane-toggle" id="airplane-toggle" data-key="simulate-offline">🌐 Simulate Offline</button>
     </div>
 
     <!-- Main Content Area -->
@@ -44,44 +61,108 @@
         
         <!-- DASHBOARD VIEW -->
         <div id="dashboard-view" class="view-container active">
-            <div class="hero-section">
-                <h2>Zero-Connectivity Patient Ledger</h2>
-                <p>Nirantar QR compresses vital medical data, encrypts it, and embeds it directly into the pixels of a QR code. Healthcare clinics can scan, decrypt, and read worker records completely offline.</p>
+            
+            <!-- Real-time Analytics Dashboard Header -->
+            <div class="dashboard-analytics-grid">
+                <div class="analytics-card">
+                    <div class="analytics-icon">📇</div>
+                    <div class="analytics-info">
+                        <h4 data-key="total-registered">Total Cards Issued</h4>
+                        <p id="stat-total-cards" class="analytics-number">0</p>
+                    </div>
+                </div>
+                <div class="analytics-card warning">
+                    <div class="analytics-icon">🚨</div>
+                    <div class="analytics-info">
+                        <h4 data-key="emergency-scans">Emergency Scans</h4>
+                        <p id="stat-emergency-scans" class="analytics-number">0</p>
+                    </div>
+                </div>
+                <div class="analytics-card success">
+                    <div class="analytics-icon">🔋</div>
+                    <div class="analytics-info">
+                        <h4 data-key="average-compression">Compression Ratio</h4>
+                        <p id="stat-avg-compression" class="analytics-number">0%</p>
+                    </div>
+                </div>
+                <div class="analytics-card info">
+                    <div class="analytics-icon">💾</div>
+                    <div class="analytics-info">
+                        <h4 data-key="offline-storage">Storage Utilized</h4>
+                        <p id="stat-storage-used" class="analytics-number">0.0 KB</p>
+                    </div>
+                </div>
             </div>
 
-            <div class="action-grid">
+            <div class="action-grid" style="margin-top: 1.5rem;">
                 <!-- Action Card 1: Generate -->
                 <div class="action-card generate">
                     <div class="action-card-icon">📋</div>
-                    <h3>Volunteer Portal</h3>
-                    <p>Interview a migrant worker, select vital metrics, and compile a high-density laminated health card.</p>
-                    <button class="action-btn">Issue New Card</button>
+                    <h3 data-key="volunteer-portal">Volunteer Portal</h3>
+                    <p data-key="volunteer-desc">Interview a migrant worker, capture photo, compute vitals, and compile a high-density encrypted health card.</p>
+                    <button class="action-btn" data-key="btn-issue-new">Issue New Card</button>
                 </div>
 
                 <!-- Action Card 2: Scan -->
                 <div class="action-card scan">
                     <div class="action-card-icon">📷</div>
-                    <h3>Clinician Portal</h3>
-                    <p>Scan a worker's health card using a local phone camera. Instantly view patient history without database lookup.</p>
-                    <button class="action-btn">Open Scanner</button>
+                    <h3 data-key="clinician-portal">Clinician Portal</h3>
+                    <p data-key="clinician-desc">Scan a worker's health card using a local phone camera. Instantly view patient history without database lookup.</p>
+                    <button class="action-btn" data-key="btn-open-scanner">Open Scanner</button>
                 </div>
             </div>
 
-            <!-- Technology Explanation -->
-            <div class="features-section">
-                <h3>The Nirantar Engine Technology</h3>
-                <div class="features-grid">
-                    <div class="feature-box">
-                        <h4>1. Compression Matrix</h4>
-                        <p>Stores records as tokenized variables (e.g. <code>DIA,HYP</code> for Diabetes and Hypertension) rather than verbose JSON to ensure the QR code stays scannable on standard phone cameras.</p>
+            <!-- Database Search & Query Ledger -->
+            <div class="card-panel search-ledger-panel">
+                <h3 data-key="local-registry-search">Local Registry Database Search</h3>
+                <div class="search-bar-row">
+                    <select id="search-type" class="search-select">
+                        <option value="id" data-key="search-opt-id">Worker ID</option>
+                        <option value="name" data-key="search-opt-name">Full Name</option>
+                        <option value="blood" data-key="search-opt-blood">Blood Group</option>
+                        <option value="condition" data-key="search-opt-condition">Chronic Condition</option>
+                        <option value="phone" data-key="search-opt-phone">Phone Number</option>
+                    </select>
+                    <input type="text" id="search-query" placeholder="Type query to filter records locally..." data-key="search-placeholder">
+                </div>
+                
+                <div class="search-results-table-container">
+                    <table class="search-results-table">
+                        <thead>
+                            <tr>
+                                <th data-key="th-id">Worker ID</th>
+                                <th data-key="th-name">Name</th>
+                                <th data-key="th-age-sex">Age/Gender</th>
+                                <th data-key="th-blood">Blood</th>
+                                <th data-key="th-risk">Risk</th>
+                                <th data-key="th-actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="search-results-body">
+                            <!-- Populated dynamically via LocalStorage -->
+                        </tbody>
+                    </table>
+                    <div id="search-empty-state" class="table-empty-state" data-key="no-records-found">
+                        No records found matching search queries.
                     </div>
-                    <div class="feature-box">
-                        <h4>2. AES Symmetrical Shield</h4>
-                        <p>Encrypts serialized tokens locally using AES-256 with a global key. Protects patient details from general public scans while remaining decryptable by any authorized scanner app.</p>
+                </div>
+            </div>
+
+            <!-- Health Disease & Vitals Distribution Analytics -->
+            <div class="card-panel chart-panel">
+                <h3 data-key="epidemic-stats">Local Registry Demographic Distribution</h3>
+                <div class="charts-row">
+                    <div class="chart-container">
+                        <h4 data-key="condition-stats">Condition Frequency</h4>
+                        <div class="bar-chart-ledger" id="conditions-chart-ledger">
+                            <!-- Bars updated dynamically -->
+                        </div>
                     </div>
-                    <div class="feature-box">
-                        <h4>3. ABDM Alignment</h4>
-                        <p>Serves as a vital fail-safe, zero-network fallback for the Ayushman Bharat Digital Mission (ABHA), ensuring continuity in deep rural regions or high-transit construction camps.</p>
+                    <div class="chart-container">
+                        <h4 data-key="vaccine-stats">Vaccination Coverage</h4>
+                        <div class="bar-chart-ledger" id="vaccines-chart-ledger">
+                            <!-- Bars updated dynamically -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -92,34 +173,85 @@
             <div class="pane-layout">
                 <!-- Form Inputs -->
                 <div class="card-panel">
-                    <h3>Worker Medical Registry</h3>
+                    <h3 data-key="registry-title">Worker Medical Registry</h3>
                     <form id="generation-form">
                         
+                        <!-- Worker ID Auto display -->
                         <div class="form-group">
-                            <label for="worker-name">Full Name</label>
+                            <label for="worker-id" data-key="lbl-worker-id">Worker ID (Auto-Generated)</label>
+                            <input type="text" id="worker-id" readonly style="font-family: monospace; font-weight: 600; color: var(--accent-success); letter-spacing: 0.05em; background: rgba(0,0,0,0.2);">
+                        </div>
+
+                        <!-- Photo Capture Section -->
+                        <div class="form-group photo-capture-group">
+                            <label data-key="lbl-photo-capture">Passport-Style Photo Capture</label>
+                            <div class="webcam-preview-box">
+                                <video id="webcam-feed" autoplay playsinline class="camera-stream" style="display: none;"></video>
+                                <canvas id="photo-canvas" style="display: none;"></canvas>
+                                <img id="photo-preview" src="" alt="Worker Photo" class="photo-thumbnail" style="display: none;">
+                                <div id="camera-placeholder" class="camera-blank">
+                                    <span>📷</span>
+                                </div>
+                            </div>
+                            <div class="camera-controls-row">
+                                <button type="button" id="btn-camera-toggle" class="btn-secondary" data-key="btn-init-camera">📷 Initialize Camera</button>
+                                <button type="button" id="btn-camera-capture" class="btn-primary" style="display: none;" data-key="btn-snap">Capture Photo</button>
+                                <button type="button" id="btn-camera-reset" class="btn-secondary" style="display: none;" data-key="btn-retake">Retake</button>
+                            </div>
+                        </div>
+
+                        <!-- Demographics Segment -->
+                        <div class="form-segment-header" data-key="hdr-personal-info">Personal Details</div>
+
+                        <div class="form-group">
+                            <label for="worker-name" data-key="lbl-name">Full Name</label>
                             <input type="text" id="worker-name" placeholder="e.g. Ram Kumar" required maxlength="30">
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="worker-age">Age (Years)</label>
+                                <label for="worker-age" data-key="lbl-age">Age (Years)</label>
                                 <input type="number" id="worker-age" min="1" max="120" placeholder="34" required>
                             </div>
                             <div class="form-group">
-                                <label for="worker-gender">Gender</label>
+                                <label for="worker-gender" data-key="lbl-gender">Gender</label>
                                 <select id="worker-gender" required>
-                                    <option value="" disabled selected>Select</option>
-                                    <option value="M">Male</option>
-                                    <option value="F">Female</option>
-                                    <option value="O">Other</option>
+                                    <option value="" disabled selected data-key="opt-select">Select</option>
+                                    <option value="M" data-key="opt-male">Male</option>
+                                    <option value="F" data-key="opt-female">Female</option>
+                                    <option value="O" data-key="opt-other">Other</option>
                                 </select>
                             </div>
                         </div>
 
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="worker-height" data-key="lbl-height">Height (cm)</label>
+                                <input type="number" id="worker-height" min="50" max="250" placeholder="170" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="worker-weight" data-key="lbl-weight">Weight (kg)</label>
+                                <input type="number" id="worker-weight" min="10" max="250" placeholder="65" required>
+                            </div>
+                        </div>
+
                         <div class="form-group">
-                            <label for="worker-blood">Blood Group</label>
+                            <label for="worker-phone" data-key="lbl-phone">Phone Number</label>
+                            <input type="text" id="worker-phone" placeholder="e.g. 9876543210" required maxlength="15">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="worker-address" data-key="lbl-address">Current Residential Address</label>
+                            <input type="text" id="worker-address" placeholder="e.g. Sector-62, Noida, UP" required maxlength="50">
+                        </div>
+
+                        <!-- Medical Segment -->
+                        <div class="form-segment-header" data-key="hdr-medical-info">Medical Information</div>
+
+                        <div class="form-group">
+                            <label for="worker-blood" data-key="lbl-blood">Blood Group</label>
                             <select id="worker-blood" required>
-                                <option value="" disabled selected>Select Blood Group</option>
+                                <option value="" disabled selected data-key="opt-select-blood">Select Blood Group</option>
                                 <option value="A+">A-Positive (A+)</option>
                                 <option value="A-">A-Negative (A-)</option>
                                 <option value="B+">B-Positive (B+)</option>
@@ -132,29 +264,74 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Chronic Conditions</label>
+                            <label data-key="lbl-chronic">Chronic Conditions</label>
                             <div class="checkbox-group">
-                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="DIA"> Diabetes</label>
-                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="HYP"> Hypertension</label>
-                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="AST"> Asthma</label>
-                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="CAR"> Cardiac</label>
-                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="TB"> Tuberculosis</label>
-                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="EPI"> Epilepsy</label>
-                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="OTH"> Other</label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="DIA"> <span data-key="chk-diabetes">Diabetes</span></label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="HYP"> <span data-key="chk-hypertension">Hypertension</span></label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="AST"> <span data-key="chk-asthma">Asthma</span></label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="CAR"> <span data-key="chk-cardiac">Cardiac</span></label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="TB"> <span data-key="chk-tuberculosis">Tuberculosis</span></label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="EPI"> <span data-key="chk-epilepsy">Epilepsy</span></label>
+                                <label class="checkbox-label"><input type="checkbox" name="conditions" value="OTH"> <span data-key="chk-other">Other</span></label>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="worker-allergies">High-Risk Allergies (Comma separated)</label>
-                            <input type="text" id="worker-allergies" placeholder="e.g. Penicillin, Sulfa Drugs, Latex" maxlength="50">
+                            <label for="worker-meds" data-key="lbl-meds">Current Medications (Comma separated)</label>
+                            <input type="text" id="worker-meds" placeholder="e.g. Metformin 500mg, Amlodipine 5mg" maxlength="60">
                         </div>
 
                         <div class="form-group">
-                            <label>Recorded Vaccinations</label>
+                            <label for="worker-allergies" data-key="lbl-allergies">High-Risk Allergies (Comma separated)</label>
+                            <input type="text" id="worker-allergies" placeholder="e.g. Penicillin, Sulfa Drugs, Latex" maxlength="50">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="worker-disability" data-key="lbl-disability">Disability Status</label>
+                                <select id="worker-disability" required>
+                                    <option value="N" data-key="opt-no">No</option>
+                                    <option value="Y" data-key="opt-yes">Yes</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="worker-donor" data-key="lbl-donor">Organ Donor</label>
+                                <select id="worker-donor" required>
+                                    <option value="Y" data-key="opt-yes">Yes</option>
+                                    <option value="N" selected data-key="opt-no">No</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="pregnancy-container" style="display: none;">
+                            <label for="worker-pregnancy" data-key="lbl-pregnancy">Pregnancy Status</label>
+                            <select id="worker-pregnancy">
+                                <option value="N" data-key="opt-no">No</option>
+                                <option value="Y" data-key="opt-yes">Yes</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="worker-last-visit" data-key="lbl-last-visit">Last Hospital/Clinic Visit</label>
+                            <input type="date" id="worker-last-visit">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="worker-surgeries" data-key="lbl-surgeries">Previous Surgeries (Comma separated)</label>
+                            <input type="text" id="worker-surgeries" placeholder="e.g. Appendectomy, Hernia Repair" maxlength="60">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="worker-devices" data-key="lbl-devices">Existing Medical Devices (e.g. Pacemaker)</label>
+                            <input type="text" id="worker-devices" placeholder="e.g. Pacemaker, Insulin Pump" maxlength="50">
+                        </div>
+
+                        <div class="form-group">
+                            <label data-key="lbl-vaccinations">Recorded Vaccinations</label>
                             <div style="display: grid; gap: 0.75rem; margin-top: 0.5rem;">
-                                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 6px;">
-                                    <label class="checkbox-label" style="margin-bottom: 0; border: none; background: transparent;"><input type="checkbox" id="vaccine-tetanus"> Tetanus</label>
-                                    <select id="year-tetanus" style="width: 100px; padding: 0.25rem;">
+                                <div class="vaccine-input-row">
+                                    <label class="checkbox-label"><input type="checkbox" id="vaccine-tetanus"> <span data-key="chk-tetanus">Tetanus</span></label>
+                                    <select id="year-tetanus" class="year-select">
                                         <option value="2026">2026</option>
                                         <option value="2025" selected>2025</option>
                                         <option value="2024">2024</option>
@@ -162,9 +339,9 @@
                                         <option value="2022">2022</option>
                                     </select>
                                 </div>
-                                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 6px;">
-                                    <label class="checkbox-label" style="margin-bottom: 0; border: none; background: transparent;"><input type="checkbox" id="vaccine-covid"> COVID-19</label>
-                                    <select id="year-covid" style="width: 100px; padding: 0.25rem;">
+                                <div class="vaccine-input-row">
+                                    <label class="checkbox-label"><input type="checkbox" id="vaccine-covid"> <span data-key="chk-covid">COVID-19</span></label>
+                                    <select id="year-covid" class="year-select">
                                         <option value="2025">2025</option>
                                         <option value="2024">2024</option>
                                         <option value="2023">2023</option>
@@ -172,9 +349,9 @@
                                         <option value="2021">2021</option>
                                     </select>
                                 </div>
-                                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 6px;">
-                                    <label class="checkbox-label" style="margin-bottom: 0; border: none; background: transparent;"><input type="checkbox" id="vaccine-bcg"> BCG</label>
-                                    <select id="year-bcg" style="width: 100px; padding: 0.25rem;">
+                                <div class="vaccine-input-row">
+                                    <label class="checkbox-label"><input type="checkbox" id="vaccine-bcg"> <span data-key="chk-bcg">BCG</span></label>
+                                    <select id="year-bcg" class="year-select">
                                         <option value="2026">2026</option>
                                         <option value="2025">2025</option>
                                         <option value="2024" selected>2024</option>
@@ -182,9 +359,9 @@
                                         <option value="2022">2022</option>
                                     </select>
                                 </div>
-                                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 6px;">
-                                    <label class="checkbox-label" style="margin-bottom: 0; border: none; background: transparent;"><input type="checkbox" id="vaccine-hepb"> Hepatitis B</label>
-                                    <select id="year-hepb" style="width: 100px; padding: 0.25rem;">
+                                <div class="vaccine-input-row">
+                                    <label class="checkbox-label"><input type="checkbox" id="vaccine-hepb"> <span data-key="chk-hepb">Hepatitis B</span></label>
+                                    <select id="year-hepb" class="year-select">
                                         <option value="2026">2026</option>
                                         <option value="2025">2025</option>
                                         <option value="2024">2024</option>
@@ -195,40 +372,108 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1.5rem;">Compile & Encrypt Health Card</button>
+                        <!-- Emergency Segment -->
+                        <div class="form-segment-header" data-key="hdr-emergency-info">Emergency & Notes</div>
+
+                        <div class="form-group">
+                            <label for="emergency-name" data-key="lbl-em-name">Emergency Contact Name</label>
+                            <input type="text" id="emergency-name" placeholder="e.g. Savitri Devi" required maxlength="30">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emergency-relation" data-key="lbl-em-relation">Relationship</label>
+                                <input type="text" id="emergency-relation" placeholder="e.g. Spouse" required maxlength="20">
+                            </div>
+                            <div class="form-group">
+                                <label for="emergency-phone" data-key="lbl-em-phone">Emergency Phone</label>
+                                <input type="text" id="emergency-phone" placeholder="e.g. 9876543212" required maxlength="15">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emergency-notes" data-key="lbl-em-notes">Priority Medical Notes (For Emergency Scan)</label>
+                            <textarea id="emergency-notes" rows="2" placeholder="e.g. Asthmatic - keep inhaler close. High risk BP." maxlength="100" class="input-textarea"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-primary btn-submit-ingestion" style="width: 100%; margin-top: 1.5rem;" data-key="btn-compile">Compile & Encrypt Health Card</button>
                     </form>
                 </div>
 
                 <!-- Preview Display -->
                 <div class="card-panel preview-panel" id="card-preview-container" style="display: none;">
-                    <h3>Physical Card Preview</h3>
+                    <h3 data-key="hdr-preview">Physical Card Preview</h3>
                     
-                    <div class="id-card-frame" id="id-card-frame">
-                        <div class="card-header">
-                            <div class="card-title">
-                                <h4>NIRANTAR HEALTH CARD</h4>
-                                <p>ABHA offline extensions</p>
+                    <!-- Laminated card frame with flip micro-interaction support -->
+                    <div class="id-card-flip-container">
+                        <div class="id-card-frame card-front" id="id-card-frame">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <h4 data-key="hdr-card-header">NIRANTAR HEALTH CARD</h4>
+                                    <p data-key="hdr-card-subheader">ABHA offline extensions</p>
+                                </div>
+                                <div style="font-size: 1.25rem;">🏥</div>
                             </div>
-                            <div style="font-size: 1.25rem;">🏥</div>
+                            <div class="card-body-layout">
+                                <div class="card-details">
+                                    <p class="card-id-text" id="preview-id">NH-8XQ7-KL42</p>
+                                    <p style="font-size: 1.05rem; font-weight: 600; margin-bottom: 0.4rem;" id="preview-name">Ram Kumar</p>
+                                    <p><span>Age/Sex:</span> <strong id="preview-meta">Male | 34 Yrs</strong></p>
+                                    <p><span>Blood Group:</span> <strong id="preview-blood" style="color: var(--accent-warning);">O-</strong></p>
+                                    <p><span>Emergency:</span> <strong id="preview-em-contact">Savitri (9876543212)</strong></p>
+                                    <p><span>Issued:</span> <strong id="preview-issue-date">2026-06-12</strong></p>
+                                </div>
+                                <div class="card-photo-qr-block">
+                                    <!-- Embedded captured photo -->
+                                    <div class="card-avatar-box">
+                                        <img id="preview-photo" src="" alt="Worker Photo" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                                        <div id="preview-photo-placeholder" style="font-size: 1.5rem;">👤</div>
+                                    </div>
+                                    <div class="card-qr-container">
+                                        <canvas id="qr-canvas"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer" data-key="card-footer-text">
+                                Issued by Union Health Camp • Keep Card Laminated
+                            </div>
                         </div>
-                        <div class="card-body-layout">
-                            <div class="card-details">
-                                <p style="font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem;" id="preview-name">Ram Kumar</p>
-                                <p><span>Age/Sex:</span> <strong id="preview-meta">Male | 34 Yrs</strong></p>
-                                <p><span>Blood Group:</span> <strong id="preview-blood" style="color: var(--accent-warning);">O-</strong></p>
-                                <p style="margin-top: 0.5rem; font-size: 0.7rem; color: var(--text-muted); line-height: 1.2;">This card stores encrypted, compressed medical history inside the QR. Scan using the Nirantar Health App completely offline.</p>
+                    </div>
+
+                    <!-- Storage Compression Analytics -->
+                    <div class="card-panel stats-card" id="compression-analytics-box">
+                        <h4 data-key="qr-stats-title">QR Storage & Compression Analytics</h4>
+                        <div class="stats-grid">
+                            <div class="stats-item">
+                                <span class="stats-label" data-key="stat-raw-json">Raw JSON Size</span>
+                                <span class="stats-value" id="stats-json-size">0 B</span>
                             </div>
-                            <div class="card-qr-container">
-                                <canvas id="qr-canvas"></canvas>
+                            <div class="stats-item">
+                                <span class="stats-label" data-key="stat-compressed">Compressed Size</span>
+                                <span class="stats-value" id="stats-compressed-size">0 B</span>
+                            </div>
+                            <div class="stats-item">
+                                <span class="stats-label" data-key="stat-encrypted">Encrypted Payload</span>
+                                <span class="stats-value" id="stats-encrypted-size">0 B</span>
+                            </div>
+                            <div class="stats-item">
+                                <span class="stats-label" data-key="stat-ratio">Compression Ratio</span>
+                                <span class="stats-value" id="stats-comp-ratio">0%</span>
                             </div>
                         </div>
-                        <div class="card-footer">
-                            Issued by Union Health Camp • Keep Card Laminated
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-label">
+                                <span data-key="qr-capacity">QR Data Capacity Used</span>
+                                <span id="stats-qr-percentage">0%</span>
+                            </div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill" id="stats-qr-fill" style="width: 0%;"></div>
+                            </div>
                         </div>
                     </div>
 
                     <div style="display: flex; gap: 1rem; width: 100%; justify-content: center;">
-                        <button id="download-card-btn" class="btn-primary">🖨️ Print Health Card</button>
+                        <button id="download-card-btn" class="btn-primary" data-key="btn-print">🖨️ Print Health Card</button>
                     </div>
                 </div>
             </div>
@@ -239,8 +484,8 @@
             <div class="pane-layout">
                 <!-- Camera view -->
                 <div class="card-panel">
-                    <h3>Symmetrical Card Reader</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Hold the health card QR up to your device camera to scan. The device will automatically decrypt and read the encrypted medical data locally.</p>
+                    <h3 data-key="scanner-title">Symmetrical Card Reader</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;" data-key="scanner-desc">Hold the health card QR up to your device camera to scan. The device will automatically decrypt and read the encrypted medical data locally.</p>
                     
                     <div class="scanner-container">
                         <div id="reader"></div>
@@ -251,71 +496,185 @@
                     </div>
 
                     <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
-                        <button id="start-scan-btn" class="btn-primary">📷 Start Webcam Stream</button>
-                        <button id="stop-scan-btn" class="btn-secondary" style="display: none;">⏹️ Stop Camera</button>
+                        <button id="start-scan-btn" class="btn-primary" data-key="btn-start-stream">📷 Start Webcam Stream</button>
+                        <button id="stop-scan-btn" class="btn-secondary" style="display: none;" data-key="btn-stop-stream">⏹️ Stop Camera</button>
                     </div>
 
                     <!-- Scan fallback -->
                     <div class="fallback-scanner">
-                        <p>No webcam? Upload a snapshot image of the QR Code card:</p>
+                        <p data-key="scanner-fallback-desc">No webcam? Upload a snapshot image of the QR Code card:</p>
                         <div class="file-input-wrapper">
-                            <button class="btn-secondary">📁 Choose QR Image</button>
+                            <button class="btn-secondary" data-key="btn-choose-qr">📁 Choose QR Image</button>
                             <input type="file" id="qr-file-input" accept="image/*">
                         </div>
                     </div>
                 </div>
 
                 <!-- Decoded Patient File -->
-                <div class="card-panel" style="min-height: 380px;">
-                    <h3>Patient Ledger Record</h3>
+                <div class="card-panel" style="min-height: 480px; display: flex; flex-direction: column;">
+                    <h3 data-key="patient-record-title">Patient Ledger Record</h3>
                     
                     <!-- Neutral/Waiting state -->
-                    <div id="scanner-placeholder" style="text-align: center; color: var(--text-muted); padding: 5rem 0;">
+                    <div id="scanner-placeholder" style="text-align: center; color: var(--text-muted); padding: 7rem 0; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;">
                         <div style="font-size: 3rem; margin-bottom: 1rem;">🔒</div>
-                        <p>Awaiting QR scan payload...</p>
-                        <p style="font-size: 0.75rem; margin-top: 0.5rem;">Align code in camera view or upload file above.</p>
+                        <p data-key="awaiting-qr">Awaiting QR scan payload...</p>
+                        <p style="font-size: 0.75rem; margin-top: 0.5rem;" data-key="awaiting-qr-desc">Align code in camera view or upload file above.</p>
                     </div>
 
-                    <!-- Decoded Health Dashboard -->
-                    <div class="health-dashboard" id="health-dashboard">
+                    <!-- STAGE 1: Decoded Emergency Dashboard Panel -->
+                    <div class="emergency-dashboard" id="emergency-dashboard" style="display: none;">
+                        <div class="verification-badge-row">
+                            <span class="verify-badge verified" id="verify-shield">✓ Authentic QR</span>
+                            <span class="verify-badge info" id="verify-version">V2</span>
+                            <span class="verify-badge info" id="verify-date">2026-06-12</span>
+                        </div>
+                        
+                        <div class="emergency-headline-box">
+                            <div class="emergency-avatar" id="em-avatar-box">
+                                <img id="em-photo" src="" alt="Emergency Photo" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                                <span id="em-photo-placeholder">👤</span>
+                            </div>
+                            <div class="emergency-patient-name-block">
+                                <h4 id="em-name">Ram Kumar</h4>
+                                <p id="em-meta">NH-8XQ7-KL42 • Male, 34 Yrs</p>
+                            </div>
+                            <div class="emergency-blood-group-badge" id="em-blood-group">O-</div>
+                        </div>
+
+                        <!-- Critical Alert Warning Badges -->
+                        <div class="alert-badges-container" id="em-alert-badges">
+                            <!-- Populated with color-coded critical conditions -->
+                        </div>
+
+                        <!-- Vitals Grid -->
+                        <div class="emergency-medical-brief-grid">
+                            <div class="medical-brief-card warning">
+                                <h5 data-key="lbl-allergies">High-Risk Allergies</h5>
+                                <div class="brief-value-list" id="em-allergies">
+                                    <span class="tag allergy">⚠️ Penicillin</span>
+                                </div>
+                            </div>
+                            <div class="medical-brief-card">
+                                <h5 data-key="lbl-meds">Current Medications</h5>
+                                <div class="brief-value-list" id="em-meds">
+                                    <span>Metformin 500mg</span>
+                                </div>
+                            </div>
+                            <div class="medical-brief-card danger">
+                                <h5 data-key="hdr-emergency-info">Emergency Contact</h5>
+                                <p id="em-contact-info" style="font-weight: 600;">Savitri Devi (Spouse)</p>
+                                <p id="em-contact-phone" class="phone-link">📞 9876543212</p>
+                            </div>
+                        </div>
+
+                        <div class="medical-brief-card notes-card">
+                            <h5 data-key="lbl-em-notes">Priority Medical Notes</h5>
+                            <p id="em-notes" style="font-style: italic;">Asthmatic - keep inhaler close. High risk BP.</p>
+                        </div>
+
+                        <div class="emergency-button-row">
+                            <button id="btn-view-full-record" class="btn-primary" style="width: 100%; justify-content: center;" data-key="btn-view-full">View Complete Health Record</button>
+                        </div>
+                    </div>
+
+                    <!-- STAGE 2: Decoded Full Health Dashboard (Nested Tab) -->
+                    <div class="health-dashboard" id="health-dashboard" style="display: none;">
                         <div class="dashboard-header">
                             <div class="patient-badge">
                                 <div class="patient-avatar" id="dash-avatar">R</div>
                                 <div class="patient-meta">
                                     <h4 id="dash-name">Ram Kumar</h4>
-                                    <p id="dash-meta">Male • 34 Years Old</p>
+                                    <p id="dash-id">NH-8XQ7-KL42</p>
+                                    <p id="dash-meta">Male • 34 Years Old • BMI: 22.4 (Normal)</p>
                                 </div>
                             </div>
-                            <div class="blood-group-badge" id="dash-blood">O-</div>
+                            <div class="dash-badges-block">
+                                <div class="health-risk-badge risk-low" id="dash-risk-badge">Low Risk</div>
+                                <div class="blood-group-badge" id="dash-blood">O-</div>
+                            </div>
                         </div>
 
+                        <!-- Vitals Table Segment -->
+                        <div class="vitals-table-row">
+                            <div class="vital-mini-box">
+                                <span class="vital-label" data-key="lbl-height">Height</span>
+                                <span class="vital-val" id="dash-height">170 cm</span>
+                            </div>
+                            <div class="vital-mini-box">
+                                <span class="vital-label" data-key="lbl-weight">Weight</span>
+                                <span class="vital-val" id="dash-weight">65 kg</span>
+                            </div>
+                            <div class="vital-mini-box">
+                                <span class="vital-label" data-key="lbl-phone">Phone</span>
+                                <span class="vital-val" id="dash-phone">9876543210</span>
+                            </div>
+                            <div class="vital-mini-box">
+                                <span class="vital-label" data-key="lbl-address">Address</span>
+                                <span class="vital-val" id="dash-address">Sector-62, Noida, UP</span>
+                            </div>
+                        </div>
+
+                        <!-- Medical Vitals Tab Row -->
                         <div class="medical-grid">
                             <div class="medical-card">
-                                <h5>Chronic Conditions</h5>
+                                <h5 data-key="lbl-chronic">Chronic Conditions</h5>
                                 <div class="condition-list" id="dash-conditions">
                                     <span class="tag condition">Diabetes</span>
-                                    <span class="tag condition">Hypertension</span>
                                 </div>
                             </div>
 
                             <div class="medical-card">
-                                <h5>High-Risk Allergies</h5>
+                                <h5 data-key="lbl-allergies">High-Risk Allergies</h5>
                                 <div class="allergy-list" id="dash-allergies">
                                     <span class="tag allergy">⚠️ Penicillin</span>
                                 </div>
                             </div>
 
-                            <div class="medical-card" style="grid-column: span 2;">
-                                <h5>Vaccination Ledger</h5>
-                                <div class="vaccine-list" id="dash-vaccines">
-                                    <span class="tag vaccine">✓ Tetanus (2025)</span>
-                                    <span class="tag vaccine">✓ COVID-19 (2022)</span>
+                            <div class="medical-card">
+                                <h5 data-key="hdr-additional-info">Additional Info</h5>
+                                <div class="additional-vitals-list" id="dash-additional">
+                                    <p>Disability: <strong id="dash-disability">No</strong></p>
+                                    <p>Organ Donor: <strong id="dash-donor">Yes</strong></p>
+                                    <p>Pregnancy: <strong id="dash-pregnancy">N/A</strong></p>
+                                </div>
+                            </div>
+
+                            <div class="medical-card">
+                                <h5 data-key="hdr-surgeries-devices">Surgeries & Devices</h5>
+                                <div class="additional-vitals-list" id="dash-surgeries-devices">
+                                    <p>Surgeries: <strong id="dash-surgeries">Appendectomy</strong></p>
+                                    <p>Devices: <strong id="dash-devices">None</strong></p>
                                 </div>
                             </div>
                         </div>
 
-                        <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
-                            <button id="reset-scan-btn" class="btn-secondary">Clear Record</button>
+                        <!-- Unified Patient Timeline (Timeline + Diagnoses + Vaccinations) -->
+                        <div class="timeline-panel" style="margin-top: 1.5rem;">
+                            <h4 data-key="hdr-health-timeline">Interactive Health & Immunization Timeline</h4>
+                            <div class="timeline-track" id="dash-timeline-track">
+                                <!-- Nodes populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Doctor Notes Portal -->
+                        <div class="doctor-notes-panel" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                            <h4 data-key="hdr-doctor-notes">Clinician Consultation Notes (Stored Offline)</h4>
+                            
+                            <!-- Notes Feed -->
+                            <div class="doctor-notes-feed" id="dash-doctor-notes-feed">
+                                <!-- Populated dynamically -->
+                            </div>
+
+                            <!-- Notes Form -->
+                            <div class="notes-composer-row" style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-direction: column;">
+                                <textarea id="txt-new-note" placeholder="Write clinical prescription, follow-up advice, or diagnoses note here..." rows="2" class="input-textarea"></textarea>
+                                <button type="button" id="btn-submit-note" class="btn-primary" style="align-self: flex-end;" data-key="btn-add-note">Add Consultation Note</button>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                            <button id="btn-back-to-emergency" class="btn-secondary" data-key="btn-view-emergency">← Back to Emergency Card</button>
+                            <button id="reset-scan-btn" class="btn-secondary" data-key="btn-clear-record">Clear Record</button>
                         </div>
                     </div>
                 </div>
@@ -326,7 +685,7 @@
 
     <!-- Footer -->
     <footer>
-        <p>Nirantar QR Offline Health Project • Built for Social Impact Hackathon • Powered by Ayushman Bharat Extension Framework</p>
+        <p data-key="footer-text">Nirantar QR Offline Health Project • Built for Social Impact Hackathon • Powered by Ayushman Bharat Extension Framework</p>
     </footer>
 
     <script src="app.js"></script>
