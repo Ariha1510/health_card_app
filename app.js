@@ -656,6 +656,14 @@ const TRANSLATIONS = {
     }
 };
 
+// Programmatic translations for clear database button
+TRANSLATIONS.en["btn-clear-database"] = "🗑️ Clear Database";
+TRANSLATIONS.hi["btn-clear-database"] = "🗑️ डेटाबेस साफ़ करें";
+TRANSLATIONS.bn["btn-clear-database"] = "🗑️ ডাটাবেস মুছুন";
+TRANSLATIONS.ta["btn-clear-database"] = "🗑️ தரவுத்தளத்தை அழி";
+TRANSLATIONS.te["btn-clear-database"] = "🗑️ డేటాబేస్ క్లియర్ చేయి";
+TRANSLATIONS.mr["btn-clear-database"] = "🗑️ डेटाबेस साफ करा";
+
 // Global variables
 let activeLanguage = 'en';
 let currentScanner = null;
@@ -685,6 +693,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 7. Load local database tables & stats
     refreshDashboardAnalytics();
+
+    // 8. Clear Database handler
+    const clearDbBtn = document.getElementById('btn-clear-db');
+    if (clearDbBtn) {
+        clearDbBtn.addEventListener('click', () => {
+            const confirmMsg = activeLanguage === 'hi' 
+                ? "क्या आप वाकई इस डिवाइस से सभी पंजीकृत स्वास्थ्य कार्ड हटाना चाहते हैं? यह कार्रवाई स्थायी है!" 
+                : "Are you sure you want to delete all registered worker health cards from this device? This action is permanent and offline!";
+            if (confirm(confirmMsg)) {
+                localStorage.removeItem('nirantar_registry');
+                localStorage.removeItem('nirantar_emergency_scans_count');
+                refreshDashboardAnalytics();
+                const successMsg = activeLanguage === 'hi' ? "डेटाबेस सफलतापूर्वक साफ़ हो गया!" : "Database cleared successfully!";
+                alert(successMsg);
+            }
+        });
+    }
 });
 
 // ==========================================

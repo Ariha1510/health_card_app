@@ -114,7 +114,10 @@
 
             <!-- Database Search & Query Ledger -->
             <div class="card-panel search-ledger-panel">
-                <h3 data-key="local-registry-search">Local Registry Database Search</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; flex-wrap: wrap; gap: 1rem;">
+                    <h3 style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;" data-key="local-registry-search">Local Registry Database Search</h3>
+                    <button id="btn-clear-db" class="btn-secondary" style="border-color: var(--accent-warning); color: var(--accent-warning); padding: 0.4rem 1rem; font-size: 0.85rem;" data-key="btn-clear-database">🗑️ Clear Database</button>
+                </div>
                 <div class="search-bar-row">
                     <select id="search-type" class="search-select">
                         <option value="id" data-key="search-opt-id">Worker ID</option>

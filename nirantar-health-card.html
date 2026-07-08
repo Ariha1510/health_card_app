@@ -1817,7 +1817,10 @@ footer {
 
             <!-- Database Search & Query Ledger -->
             <div class="card-panel search-ledger-panel">
-                <h3 data-key="local-registry-search">Local Registry Database Search</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; flex-wrap: wrap; gap: 1rem;">
+                    <h3 style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;" data-key="local-registry-search">Local Registry Database Search</h3>
+                    <button id="btn-clear-db" class="btn-secondary" style="border-color: var(--accent-warning); color: var(--accent-warning); padding: 0.4rem 1rem; font-size: 0.85rem;" data-key="btn-clear-database">ðŸ—‘ï¸ Clear Database</button>
+                </div>
                 <div class="search-bar-row">
                     <select id="search-type" class="search-select">
                         <option value="id" data-key="search-opt-id">Worker ID</option>
@@ -3050,6 +3053,14 @@ const TRANSLATIONS = {
     }
 };
 
+// Programmatic translations for clear database button
+TRANSLATIONS.en["btn-clear-database"] = "ðŸ—‘ï¸ Clear Database";
+TRANSLATIONS.hi["btn-clear-database"] = "ðŸ—‘ï¸ à¤¡à¥‡à¤Ÿà¤¾à¤¬à¥‡à¤¸ à¤¸à¤¾à¤«à¤¼ à¤•à¤°à¥‡à¤‚";
+TRANSLATIONS.bn["btn-clear-database"] = "ðŸ—‘ï¸ à¦¡à¦¾à¦Ÿà¦¾à¦¬à§‡à¦¸ à¦®à§à¦›à§à¦¨";
+TRANSLATIONS.ta["btn-clear-database"] = "ðŸ—‘ï¸ à®¤à®°à®µà¯à®¤à¯à®¤à®³à®¤à¯à®¤à¯ˆ à®…à®´à®¿";
+TRANSLATIONS.te["btn-clear-database"] = "ðŸ—‘ï¸ à°¡à±‡à°Ÿà°¾à°¬à±‡à°¸à± à°•à±à°²à°¿à°¯à°°à± à°šà±‡à°¯à°¿";
+TRANSLATIONS.mr["btn-clear-database"] = "ðŸ—‘ï¸ à¤¡à¥‡à¤Ÿà¤¾à¤¬à¥‡à¤¸ à¤¸à¤¾à¤« à¤•à¤°à¤¾";
+
 // Global variables
 let activeLanguage = 'en';
 let currentScanner = null;
@@ -3079,6 +3090,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 7. Load local database tables & stats
     refreshDashboardAnalytics();
+
+    // 8. Clear Database handler
+    const clearDbBtn = document.getElementById('btn-clear-db');
+    if (clearDbBtn) {
+        clearDbBtn.addEventListener('click', () => {
+            const confirmMsg = activeLanguage === 'hi' 
+                ? "à¤•à¥à¤¯à¤¾ à¤†à¤ª à¤µà¤¾à¤•à¤ˆ à¤‡à¤¸ à¤¡à¤¿à¤µà¤¾à¤‡à¤¸ à¤¸à¥‡ à¤¸à¤­à¥€ à¤ªà¤‚à¤œà¥€à¤•à¥ƒà¤¤ à¤¸à¥à¤µà¤¾à¤¸à¥à¤¥à¥à¤¯ à¤•à¤¾à¤°à¥à¤¡ à¤¹à¤Ÿà¤¾à¤¨à¤¾ à¤šà¤¾à¤¹à¤¤à¥‡ à¤¹à¥ˆà¤‚? à¤¯à¤¹ à¤•à¤¾à¤°à¥à¤°à¤µà¤¾à¤ˆ à¤¸à¥à¤¥à¤¾à¤¯à¥€ à¤¹à¥ˆ!" 
+                : "Are you sure you want to delete all registered worker health cards from this device? This action is permanent and offline!";
+            if (confirm(confirmMsg)) {
+                localStorage.removeItem('nirantar_registry');
+                localStorage.removeItem('nirantar_emergency_scans_count');
+                refreshDashboardAnalytics();
+                const successMsg = activeLanguage === 'hi' ? "à¤¡à¥‡à¤Ÿà¤¾à¤¬à¥‡à¤¸ à¤¸à¤«à¤²à¤¤à¤¾à¤ªà¥‚à¤°à¥à¤µà¤• à¤¸à¤¾à¤«à¤¼ à¤¹à¥‹ à¤—à¤¯à¤¾!" : "Database cleared successfully!";
+                alert(successMsg);
+            }
+        });
+    }
 });
 
 // ==========================================
