@@ -1338,13 +1338,12 @@ function refreshDashboardAnalytics() {
     const emergencyCount = parseInt(localStorage.getItem('nirantar_emergency_scans_count') || '0');
     emergencyScansEl.innerText = emergencyCount;
 
-    // Local storage size approximation
+    // Local storage size approximation (Nirantar database keys only)
     let storageBytes = 0;
-    for (let key in localStorage) {
-        if (localStorage.hasOwnProperty(key)) {
-            storageBytes += localStorage[key].length * 2; // UTF-16 characters count
-        }
-    }
+    const regRaw = localStorage.getItem('nirantar_registry');
+    const scanRaw = localStorage.getItem('nirantar_emergency_scans_count');
+    if (regRaw) storageBytes += regRaw.length * 2;
+    if (scanRaw) storageBytes += scanRaw.length * 2;
     const kbUsed = (storageBytes / 1024).toFixed(1);
     storageEl.innerText = `${kbUsed} KB`;
 
