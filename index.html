@@ -18,10 +18,6 @@
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
-    <!-- Splash Screen -->
-    <div id="splash-screen">
-        <img src="assets/logo.png" alt="Nirantar Health Logo" class="splash-logo">
-    </div>
 
     <!-- Header containing logo and navigation tabs -->
     <header>
@@ -210,7 +206,7 @@
 
                         <div class="form-group">
                             <label for="worker-name" data-key="lbl-name">Full Name</label>
-                            <input type="text" id="worker-name" placeholder="e.g. Ram Kumar" required maxlength="30">
+                            <input type="text" id="worker-name" placeholder="e.g. Rahul Sharma" required maxlength="30">
                         </div>
 
                         <div class="form-row">
@@ -421,12 +417,12 @@
                             </div>
                             <div class="card-body-layout">
                                 <div class="card-details">
-                                    <p class="card-id-text" id="preview-id">NH-8XQ7-KL42</p>
-                                    <p style="font-size: 1.05rem; font-weight: 600; margin-bottom: 0.4rem;" id="preview-name">Ram Kumar</p>
-                                    <p><span>Age/Sex:</span> <strong id="preview-meta">Male | 34 Yrs</strong></p>
-                                    <p><span>Blood Group:</span> <strong id="preview-blood" style="color: var(--accent-warning);">O-</strong></p>
-                                    <p><span>Emergency:</span> <strong id="preview-em-contact">Savitri (9876543212)</strong></p>
-                                    <p><span>Issued:</span> <strong id="preview-issue-date">2026-06-12</strong></p>
+                                    <p class="card-id-text" id="preview-id">NH-XXXX-XXXX</p>
+                                    <p style="font-size: 1.05rem; font-weight: 600; margin-bottom: 0.4rem;" id="preview-name">Worker Name</p>
+                                    <p><span>Age/Sex:</span> <strong id="preview-meta">- | -</strong></p>
+                                    <p><span>Blood Group:</span> <strong id="preview-blood" style="color: var(--accent-warning);">-</strong></p>
+                                    <p><span>Emergency:</span> <strong id="preview-em-contact">-</strong></p>
+                                    <p><span>Issued:</span> <strong id="preview-issue-date">-</strong></p>
                                 </div>
                                 <div class="card-photo-qr-block">
                                     <!-- Embedded captured photo -->
@@ -540,10 +536,10 @@
                                 <span id="em-photo-placeholder">👤</span>
                             </div>
                             <div class="emergency-patient-name-block">
-                                <h4 id="em-name">Ram Kumar</h4>
-                                <p id="em-meta">NH-8XQ7-KL42 • Male, 34 Yrs</p>
+                                <h4 id="em-name">Patient Name</h4>
+                                <p id="em-meta">ID • Gender, Age</p>
                             </div>
-                            <div class="emergency-blood-group-badge" id="em-blood-group">O-</div>
+                            <div class="emergency-blood-group-badge" id="em-blood-group">-</div>
                         </div>
 
                         <!-- Critical Alert Warning Badges -->
@@ -556,25 +552,25 @@
                             <div class="medical-brief-card warning">
                                 <h5 data-key="lbl-allergies">High-Risk Allergies</h5>
                                 <div class="brief-value-list" id="em-allergies">
-                                    <span class="tag allergy">⚠️ Penicillin</span>
+                                    <span class="tag allergy">None</span>
                                 </div>
                             </div>
                             <div class="medical-brief-card">
                                 <h5 data-key="lbl-meds">Current Medications</h5>
                                 <div class="brief-value-list" id="em-meds">
-                                    <span>Metformin 500mg</span>
+                                    <span>None</span>
                                 </div>
                             </div>
                             <div class="medical-brief-card danger">
                                 <h5 data-key="hdr-emergency-info">Emergency Contact</h5>
-                                <p id="em-contact-info" style="font-weight: 600;">Savitri Devi (Spouse)</p>
-                                <p id="em-contact-phone" class="phone-link">📞 9876543212</p>
+                                <p id="em-contact-info" style="font-weight: 600;">-</p>
+                                <p id="em-contact-phone" class="phone-link">-</p>
                             </div>
                         </div>
 
                         <div class="medical-brief-card notes-card">
                             <h5 data-key="lbl-em-notes">Priority Medical Notes</h5>
-                            <p id="em-notes" style="font-style: italic;">Asthmatic - keep inhaler close. High risk BP.</p>
+                            <p id="em-notes" style="font-style: italic;">None provided.</p>
                         </div>
 
                         <div class="emergency-button-row">
@@ -586,16 +582,16 @@
                     <div class="health-dashboard" id="health-dashboard" style="display: none;">
                         <div class="dashboard-header">
                             <div class="patient-badge">
-                                <div class="patient-avatar" id="dash-avatar">R</div>
+                                <div class="patient-avatar" id="dash-avatar">?</div>
                                 <div class="patient-meta">
-                                    <h4 id="dash-name">Ram Kumar</h4>
-                                    <p id="dash-id">NH-8XQ7-KL42</p>
-                                    <p id="dash-meta">Male • 34 Years Old • BMI: 22.4 (Normal)</p>
+                                    <h4 id="dash-name">Patient Name</h4>
+                                    <p id="dash-id">NH-XXXX-XXXX</p>
+                                    <p id="dash-meta">Gender • Age</p>
                                 </div>
                             </div>
                             <div class="dash-badges-block">
-                                <div class="health-risk-badge risk-low" id="dash-risk-badge">Low Risk</div>
-                                <div class="blood-group-badge" id="dash-blood">O-</div>
+                                <div class="health-risk-badge risk-low" id="dash-risk-badge">Status</div>
+                                <div class="blood-group-badge" id="dash-blood">-</div>
                             </div>
                         </div>
 
@@ -603,19 +599,19 @@
                         <div class="vitals-table-row">
                             <div class="vital-mini-box">
                                 <span class="vital-label" data-key="lbl-height">Height</span>
-                                <span class="vital-val" id="dash-height">170 cm</span>
+                                <span class="vital-val" id="dash-height">- cm</span>
                             </div>
                             <div class="vital-mini-box">
                                 <span class="vital-label" data-key="lbl-weight">Weight</span>
-                                <span class="vital-val" id="dash-weight">65 kg</span>
+                                <span class="vital-val" id="dash-weight">- kg</span>
                             </div>
                             <div class="vital-mini-box">
                                 <span class="vital-label" data-key="lbl-phone">Phone</span>
-                                <span class="vital-val" id="dash-phone">9876543210</span>
+                                <span class="vital-val" id="dash-phone">-</span>
                             </div>
                             <div class="vital-mini-box">
                                 <span class="vital-label" data-key="lbl-address">Address</span>
-                                <span class="vital-val" id="dash-address">Sector-62, Noida, UP</span>
+                                <span class="vital-val" id="dash-address">-</span>
                             </div>
                         </div>
 
@@ -624,31 +620,31 @@
                             <div class="medical-card">
                                 <h5 data-key="lbl-chronic">Chronic Conditions</h5>
                                 <div class="condition-list" id="dash-conditions">
-                                    <span class="tag condition">Diabetes</span>
+                                    <span class="tag condition">None</span>
                                 </div>
                             </div>
 
                             <div class="medical-card">
                                 <h5 data-key="lbl-allergies">High-Risk Allergies</h5>
                                 <div class="allergy-list" id="dash-allergies">
-                                    <span class="tag allergy">⚠️ Penicillin</span>
+                                    <span class="tag allergy">None</span>
                                 </div>
                             </div>
 
                             <div class="medical-card">
                                 <h5 data-key="hdr-additional-info">Additional Info</h5>
                                 <div class="additional-vitals-list" id="dash-additional">
-                                    <p>Disability: <strong id="dash-disability">No</strong></p>
-                                    <p>Organ Donor: <strong id="dash-donor">Yes</strong></p>
-                                    <p>Pregnancy: <strong id="dash-pregnancy">N/A</strong></p>
+                                    <p>Disability: <strong id="dash-disability">-</strong></p>
+                                    <p>Organ Donor: <strong id="dash-donor">-</strong></p>
+                                    <p>Pregnancy: <strong id="dash-pregnancy">-</strong></p>
                                 </div>
                             </div>
 
                             <div class="medical-card">
                                 <h5 data-key="hdr-surgeries-devices">Surgeries & Devices</h5>
                                 <div class="additional-vitals-list" id="dash-surgeries-devices">
-                                    <p>Surgeries: <strong id="dash-surgeries">Appendectomy</strong></p>
-                                    <p>Devices: <strong id="dash-devices">None</strong></p>
+                                    <p>Surgeries: <strong id="dash-surgeries">-</strong></p>
+                                    <p>Devices: <strong id="dash-devices">-</strong></p>
                                 </div>
                             </div>
                         </div>
