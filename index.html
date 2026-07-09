@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Nirantar Health: An offline QR-based health card system and medical continuity portal for migrant workers and rural populations.">
     <title>Nirantar Health - Mobile Offline Health Continuity Portal</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.json">
@@ -10,11 +11,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <!-- Cryptography Library (AES, PBKDF2, HMAC) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <!-- QR Code Compiler Library (Canvas) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.1/qrcode.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.1/qrcode.min.js"></script>
     <!-- HTML5 QR Code Scanner Library (Camera) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
 
@@ -114,19 +115,16 @@
 
             <!-- Database Search & Query Ledger -->
             <div class="card-panel search-ledger-panel">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; flex-wrap: wrap; gap: 1rem;">
-                    <h3 style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;" data-key="local-registry-search">Local Registry Database Search</h3>
-                    <button id="btn-clear-db" class="btn-secondary" style="border-color: var(--accent-warning); color: var(--accent-warning); padding: 0.4rem 1rem; font-size: 0.85rem;" data-key="btn-clear-database">🗑️ Clear Database</button>
-                </div>
+                <h3 data-key="local-registry-search">Local Registry Database Search</h3>
                 <div class="search-bar-row">
-                    <select id="search-type" class="search-select">
+                    <select id="search-type" class="search-select" aria-label="Search by category">
                         <option value="id" data-key="search-opt-id">Worker ID</option>
                         <option value="name" data-key="search-opt-name">Full Name</option>
                         <option value="blood" data-key="search-opt-blood">Blood Group</option>
                         <option value="condition" data-key="search-opt-condition">Chronic Condition</option>
                         <option value="phone" data-key="search-opt-phone">Phone Number</option>
                     </select>
-                    <input type="text" id="search-query" placeholder="Type query to filter records locally..." data-key="search-placeholder">
+                    <input type="text" id="search-query" placeholder="Type query to filter records locally..." data-key="search-placeholder" aria-label="Search query">
                 </div>
                 
                 <div class="search-results-table-container">
@@ -153,16 +151,16 @@
 
             <!-- Health Disease & Vitals Distribution Analytics -->
             <div class="card-panel chart-panel">
-                <h3 data-key="epidemic-stats">Local Registry Demographic Distribution</h3>
+                <h2 data-key="epidemic-stats">Local Registry Demographic Distribution</h2>
                 <div class="charts-row">
                     <div class="chart-container">
-                        <h4 data-key="condition-stats">Condition Frequency</h4>
+                        <h3 data-key="condition-stats">Condition Frequency</h3>
                         <div class="bar-chart-ledger" id="conditions-chart-ledger">
                             <!-- Bars updated dynamically -->
                         </div>
                     </div>
                     <div class="chart-container">
-                        <h4 data-key="vaccine-stats">Vaccination Coverage</h4>
+                        <h3 data-key="vaccine-stats">Vaccination Coverage</h3>
                         <div class="bar-chart-ledger" id="vaccines-chart-ledger">
                             <!-- Bars updated dynamically -->
                         </div>
@@ -334,7 +332,7 @@
                             <div style="display: grid; gap: 0.75rem; margin-top: 0.5rem;">
                                 <div class="vaccine-input-row">
                                     <label class="checkbox-label"><input type="checkbox" id="vaccine-tetanus"> <span data-key="chk-tetanus">Tetanus</span></label>
-                                    <select id="year-tetanus" class="year-select">
+                                    <select id="year-tetanus" class="year-select" aria-label="Tetanus vaccination year">
                                         <option value="2026">2026</option>
                                         <option value="2025" selected>2025</option>
                                         <option value="2024">2024</option>
@@ -344,7 +342,7 @@
                                 </div>
                                 <div class="vaccine-input-row">
                                     <label class="checkbox-label"><input type="checkbox" id="vaccine-covid"> <span data-key="chk-covid">COVID-19</span></label>
-                                    <select id="year-covid" class="year-select">
+                                    <select id="year-covid" class="year-select" aria-label="COVID vaccination year">
                                         <option value="2025">2025</option>
                                         <option value="2024">2024</option>
                                         <option value="2023">2023</option>
@@ -354,7 +352,7 @@
                                 </div>
                                 <div class="vaccine-input-row">
                                     <label class="checkbox-label"><input type="checkbox" id="vaccine-bcg"> <span data-key="chk-bcg">BCG</span></label>
-                                    <select id="year-bcg" class="year-select">
+                                    <select id="year-bcg" class="year-select" aria-label="BCG vaccination year">
                                         <option value="2026">2026</option>
                                         <option value="2025">2025</option>
                                         <option value="2024" selected>2024</option>
@@ -364,7 +362,7 @@
                                 </div>
                                 <div class="vaccine-input-row">
                                     <label class="checkbox-label"><input type="checkbox" id="vaccine-hepb"> <span data-key="chk-hepb">Hepatitis B</span></label>
-                                    <select id="year-hepb" class="year-select">
+                                    <select id="year-hepb" class="year-select" aria-label="Hepatitis B vaccination year">
                                         <option value="2026">2026</option>
                                         <option value="2025">2025</option>
                                         <option value="2024">2024</option>
@@ -670,7 +668,7 @@
 
                             <!-- Notes Form -->
                             <div class="notes-composer-row" style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-direction: column;">
-                                <textarea id="txt-new-note" placeholder="Write clinical prescription, follow-up advice, or diagnoses note here..." rows="2" class="input-textarea"></textarea>
+                                <textarea id="txt-new-note" placeholder="Write clinical prescription, follow-up advice, or diagnoses note here..." rows="2" class="input-textarea" aria-label="Consultation note"></textarea>
                                 <button type="button" id="btn-submit-note" class="btn-primary" style="align-self: flex-end;" data-key="btn-add-note">Add Consultation Note</button>
                             </div>
                         </div>
@@ -691,6 +689,6 @@
         <p data-key="footer-text">Nirantar QR Offline Health Project • Built for Social Impact Hackathon • Powered by Ayushman Bharat Extension Framework</p>
     </footer>
 
-    <script src="app.js"></script>
+    <script defer src="app.js"></script>
 </body>
 </html>
