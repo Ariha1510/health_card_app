@@ -1910,3 +1910,16 @@ function resetScannerUI() {
     document.getElementById('qr-file-input').value = '';
     activeScannedProfile = null;
 }
+
+ / /   - - -   S p l a s h   S c r e e n   L o g i c   - - - 
+ w i n d o w . a d d E v e n t L i s t e n e r ( ' l o a d ' ,   ( )   = >   { 
+         s e t T i m e o u t ( ( )   = >   { 
+                 d o c u m e n t . b o d y . c l a s s L i s t . a d d ( ' a p p - l o a d e d ' ) ; 
+                 s e t T i m e o u t ( ( )   = >   { 
+                         c o n s t   s p l a s h   =   d o c u m e n t . g e t E l e m e n t B y I d ( ' s p l a s h - s c r e e n ' ) ; 
+                         i f ( s p l a s h )   s p l a s h . r e m o v e ( ) ; 
+                 } ,   8 0 0 ) ; 
+         } ,   1 5 0 0 ) ;   / /   D i s p l a y   s p l a s h   f o r   1 . 5   s e c o n d s 
+ } ) ; 
+  
+ 
