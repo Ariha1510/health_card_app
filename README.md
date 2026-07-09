@@ -153,7 +153,6 @@ health_card_app/
 
 ## 📸 Gallery & Video Demo
 
-*(We recommend extracting the following frames from the `Nirantar Health Card video.mp4` file included in your downloads folder to populate this section)*
 
 | Real-Time Dashboard | Health Card Generator |
 |:---:|:---:|
