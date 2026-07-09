@@ -113,18 +113,28 @@ graph LR;
 ```text
 health_card_app/
 │
-├── index.html           # Main application shell (Dashboard, Gen, Scan)
-├── styles.css           # Custom UI/UX Design System
-├── app.js               # Core logic, encryption, QR generation/scanning
-├── manifest.json        # PWA configuration
-├── service-worker.js    # Offline caching mechanisms
-├── assets/              # Icons, logos, placeholders
-│   ├── icon-192x192.png
-│   └── icon-512x512.png
-└── docs/                # Extended documentation
-    ├── CONTRIBUTING.md
-    ├── CODE_OF_CONDUCT.md
-    └── SECURITY.md
+├── assets/                     # UI Screenshots & visual assets
+│   ├── demo-dashboard.png
+│   ├── demo-generator.png
+│   ├── demo-scanner.png.png
+│   ├── demo-card.png
+│   └── demo-card_download.png
+│
+├── index.html                  # Main application shell (Dashboard, Gen, Scan)
+├── nirantar-health-card.html   # Consolidated portable shell
+├── presentation.html           # Presentation view
+├── styles.css                  # Custom UI/UX Design System
+├── app.js                      # Core logic, encryption, QR generation/scanning
+│
+├── manifest.json               # PWA configuration
+├── sw.js                       # Offline Service Worker mechanisms
+│
+├── README.md                   # Project documentation
+├── CHANGELOG.md                # Release notes & updates
+├── CODE_OF_CONDUCT.md          # Community guidelines
+├── CONTRIBUTING.md             # Contribution rules
+├── SECURITY.md                 # Security & vulnerability policies
+└── LICENSE                     # MIT License
 ```
 
 ---
