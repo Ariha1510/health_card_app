@@ -1,8 +1,6 @@
 # 🛡️ Nirantar Health
 **Offline Health Continuity Portal for Migrant Workers**
 
-![Nirantar Health Banner](https://via.placeholder.com/1200x400/060e11/2dd4bf?text=Nirantar+Health+-+Bridging+the+Digital+Divide)
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Glossary/HTML5)
 [![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
@@ -152,7 +150,6 @@ health_card_app/
 ---
 
 ## 📸 Gallery
-
 | Real-Time Dashboard | Health Card Generator |
 |:---:|:---:|
 | `![Dashboard](assets/demo-dashboard.png)` <br> *View local registry stats and offline analytics.* | `![Generator](assets/demo-generator.png)` <br> *Input demographics, medical history, and capture photo.* |
@@ -203,24 +200,6 @@ health_card_app/
 
 ---
 
-## 🌍 Project Portfolio Details
-
-### GitHub Profile Setup
-- **Topics**: `healthtech`, `pwa`, `offline-first`, `qr-code`, `social-impact`, `cryptography`, `hackathon`
-- **Badges**: Use the shields provided at the top of this README.
-- **Recommendation**: Pin this repository to your GitHub profile to showcase full-stack and architectural capabilities.
-
-### LinkedIn / Resume Elevator Pitch
-> *"Developed 'Nirantar Health', an offline-first Progressive Web App designed for rural healthcare continuity. Engineered a zero-network cryptographic engine that compresses and encrypts comprehensive medical histories into physical QR cards, allowing clinicians to instantly access life-saving data without internet connectivity. Implemented using Vanilla JS, HTML5 Camera APIs, and Service Workers for maximum accessibility."*
-
----
-
-## 🔮 Roadmap & Future Scope
-- [ ] **Facial Recognition Anchor**: Bind the QR payload to a lightweight facial biometric hash to prevent card sharing.
-- [ ] **Bluetooth Sync**: Allow nearby offline clinics to sync their local registries via Bluetooth Mesh networks.
-- [ ] **ABHA Integration API**: Build a sync module that uploads cached offline logs to the national ABHA grid once network connectivity is restored.
-
----
 
 ## ❓ FAQ & Known Issues
 
@@ -247,5 +226,3 @@ A: No. The decryption key and parsing logic are entirely self-contained within t
 
 **Privacy Policy**: Nirantar Health does not collect, transmit, or monetize user data. All data inputted into the system is either printed directly to the physical QR card or temporarily stored in the local browser's `localStorage` (which never leaves the host device).
 
----
-*Built with ❤️ for the Build For Good Hackathon.*
