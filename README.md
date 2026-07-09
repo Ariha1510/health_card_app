@@ -151,21 +151,15 @@ health_card_app/
 
 ---
 
-## 📸 Gallery & Video Demo
-
-*(We recommend extracting the following frames from the `Nirantar Health Card video.mp4` file included in your downloads folder to populate this section)*
+## 📸 Gallery
 
 | Real-Time Dashboard | Health Card Generator |
 |:---:|:---:|
 | `![Dashboard](assets/demo-dashboard.png)` <br> *View local registry stats and offline analytics.* | `![Generator](assets/demo-generator.png)` <br> *Input demographics, medical history, and capture photo.* |
 
-| Physical Card Preview | Symmetrical Scanner |
-|:---:|:---:|
-| `![Card Preview](assets/demo-card.png)` <br> *Printable laminated card layout with generated QR.* | `![Scanner](assets/demo-scanner.png)` <br> *Clinician view showing decoded emergency patient data.* |
-
-### 🎥 Demo Video
-`![Nirantar Health Demo GIF](assets/nirantar-demo.gif)`
-> *Watch the full zero-network workflow from patient ingestion to emergency scanning.*
+| Symmetrical Scanner |
+|:---:|
+| `![Scanner](assets/demo-scanner.png)` <br> *Clinician view showing decoded emergency patient data.* |
 
 ---
 
