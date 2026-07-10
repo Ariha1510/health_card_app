@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="logo.png" width="250" alt="Nirantar Health Logo">
+</div>
+
 # 🛡️ Nirantar Health
 **Offline Health Continuity Portal for Migrant Workers**
 
@@ -11,42 +15,22 @@
 
 ## 📖 Table of Contents
 1. [Elevator Pitch](#-elevator-pitch)
-2. [Branding & Design System](#-branding--design-system)
-3. [Architecture & Data Flow](#-architecture--data-flow)
-4. [Features](#-features)
-5. [Offline-First & PWA Workflow](#-offline-first--pwa-workflow)
-6. [Gallery & Video Demo](#-gallery--video-demo)
-7. [Installation & Setup](#-installation--setup)
-8. [Accessibility & Compatibility](#-accessibility--compatibility)
-9. [Project Portfolio Details](#-project-portfolio-details)
-10. [Roadmap & Future Scope](#-roadmap--future-scope)
-11. [Community & Documentation](#-community--documentation)
-12. [Disclaimer & Privacy](#-disclaimer--privacy)
+
+2. [Architecture & Data Flow](#-architecture--data-flow)
+3. [Features](#-features)
+4. [Offline-First & PWA Workflow](#-offline-first--pwa-workflow)
+5. [Gallery & Video Demo](#-gallery--video-demo)
+6. [Installation & Setup](#-installation--setup)
+7. [Accessibility & Compatibility](#-accessibility--compatibility)
+8. [Project Portfolio Details](#-project-portfolio-details)
+9. [Roadmap & Future Scope](#-roadmap--future-scope)
+10. [Community & Documentation](#-community--documentation)
+11. [Disclaimer & Privacy](#-disclaimer--privacy)
 
 ---
 
-## 🚀 Elevator Pitch
+##  Elevator Pitch
 **Nirantar Health** is a completely offline, zero-network Progressive Web App (PWA) designed to provide portable, encrypted health records to migrant workers and rural populations. By condensing complex medical histories, emergency contacts, and vital stats into a high-density, cryptographically sealed QR code, Nirantar ensures that first responders and clinicians can access life-saving patient data instantaneously—even in areas with zero internet connectivity. 
-
----
-
-## 🎨 Branding & Design System
-
-### Visual Identity
-- **Logo Concept**: A fusion of a Medical Cross, a Digital QR Matrix, and a Shield. It represents health, technology, and uncompromised security.
-- **Favicon**: A stylized `N` surrounded by a teal medical cross `[+]`.
-
-### Color Palette
-- **Background Primary**: `#060e11` (Deep Space Cyan)
-- **Background Secondary**: `#0d1e24` (Dark Cyan Slate)
-- **Accent Primary**: `#0d9488` (Teal)
-- **Accent Success**: `#2dd4bf` (Bright Teal/Mint)
-- **Accent Warning**: `#f43f5e` (Rose Red)
-- **Text Main**: `#e2f8f5` (Ice White)
-- **Text Muted**: `#a4c2c6` (Muted Cyan)
-
-### Typography
-- **Primary Font**: `Outfit`, sans-serif. Chosen for its modern, geometric, and highly legible characteristics, especially on low-resolution mobile screens.
 
 ---
 
@@ -139,7 +123,7 @@ health_card_app/
 
 ---
 
-## ⚡ Features
+## Features
 
 1. **Zero-Network Functionality**: Operates 100% offline via PWA Service Workers. No backend server or cloud database required.
 2. **Cryptographic Security**: Employs AES encryption and HMAC integrity seals to ensure data authenticity and prevent tampering.
@@ -150,7 +134,7 @@ health_card_app/
 
 ---
 
-## 🔌 Offline-First & PWA Workflow
+## Offline-First & PWA Workflow
 
 **Progressive Web App (PWA) Implementation**:
 - **Manifest**: The `manifest.json` file dictates how the app behaves when installed on a mobile home screen (standalone mode, theme colors, icons).
@@ -159,7 +143,7 @@ health_card_app/
 
 ---
 
-## 📸 Gallery
+## Gallery
 | Real-Time Dashboard | Health Card Generator |
 |:---:|:---:|
 | `![Dashboard](assets/demo-dashboard.png)` <br> *View local registry stats and offline analytics.* | `![Generator](assets/demo-generator.png)` <br> *Input demographics, medical history, and capture photo.* |
@@ -170,7 +154,7 @@ health_card_app/
 
 ---
 
-## 💻 Installation & Setup
+## Installation & Setup
 
 1. **Clone the Repository**:
    ```bash
@@ -187,13 +171,13 @@ health_card_app/
    npx serve .
    ```
 3. **Access the App**:
-   Navigate to `http://localhost:8000`.
+   Navigate to `https://hilarious-lamington-8e1793.netlify.app/`.
 4. **Install PWA**:
    Click the "📥 Install App" button in the header, or use your browser's "Add to Home Screen" prompt to install it natively on your device.
 
 ---
 
-## ♿ Accessibility & Compatibility
+## Accessibility & Compatibility
 
 ### Accessibility (A11y)
 - Semantic HTML tags (`<header>`, `<main>`, `<footer>`, `<h2>`, `<h3>`).
@@ -211,7 +195,7 @@ health_card_app/
 ---
 
 
-## ❓ FAQ & Known Issues
+## FAQ & Known Issues
 
 **Q: Does the scanner require an internet connection to read the QR?**
 A: No. The decryption key and parsing logic are entirely self-contained within the PWA client logic.
@@ -221,7 +205,7 @@ A: No. The decryption key and parsing logic are entirely self-contained within t
 
 ---
 
-## 📜 Community & Documentation
+##  Community & Documentation
 
 - [Contributing Guidelines](CONTRIBUTING.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
@@ -230,7 +214,7 @@ A: No. The decryption key and parsing logic are entirely self-contained within t
 
 ---
 
-## ⚖️ Disclaimer & Privacy Policy
+## Disclaimer & Privacy Policy
 
 **Disclaimer**: This application is a prototype built for a Hackathon and Social Impact demonstrations. It is not currently certified for HIPAA/clinical compliance. 
 
