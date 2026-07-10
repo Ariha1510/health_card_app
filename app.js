@@ -12,7 +12,7 @@ const DICTIONARY = {
         'HYP': 'Hypertension',
         'AST': 'Asthma',
         'CAR': 'Cardiac Condition',
-        'TB':  'Tuberculosis',
+        'TB': 'Tuberculosis',
         'EPI': 'Epilepsy',
         'OTH': 'Other Chronic'
     },
@@ -670,13 +670,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Navigation Tab Setup
     setupNavigation();
-    
+
     // 3. Ingestion Photo capture Stream
     setupWebcamCapture();
 
     // 4. Generator Screen setups
     setupGenerator();
-    
+
     // 5. Camera & File scanner configs
     setupScanner();
 
@@ -738,7 +738,7 @@ function setupLocalization() {
 function switchLanguage(langCode) {
     if (!TRANSLATIONS[langCode]) return;
     activeLanguage = langCode;
-    
+
     const elementsToTranslate = document.querySelectorAll('[data-key]');
     elementsToTranslate.forEach(el => {
         const key = el.getAttribute('data-key');
@@ -856,7 +856,7 @@ function setupWebcamCapture() {
     const canvas = document.getElementById('photo-canvas');
     const preview = document.getElementById('photo-preview');
     const placeholder = document.getElementById('camera-placeholder');
-    
+
     const btnToggle = document.getElementById('btn-camera-toggle');
     const btnCapture = document.getElementById('btn-camera-capture');
     const btnReset = document.getElementById('btn-camera-reset');
@@ -886,19 +886,19 @@ function setupWebcamCapture() {
         const ctx = canvas.getContext('2d');
         canvas.width = 130;
         canvas.height = 130;
-        
+
         // Draw cropped circle or crop square center
         ctx.drawImage(video, 0, 0, 130, 130);
         const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
         activeWorkerPhotoBase64 = dataUrl;
-        
+
         preview.src = dataUrl;
         preview.style.display = 'block';
         video.style.display = 'none';
-        
+
         btnCapture.style.display = 'none';
         btnReset.style.display = 'inline-block';
-        
+
         // Stop stream immediately to save battery/camera lock
         stopWebcamStream();
     });
@@ -940,7 +940,7 @@ function generateUniqueWorkerID() {
 function deriveWorkerKey(workerId) {
     // MasterKey + workerId salt
     const derived = CryptoJS.PBKDF2(CONFIG.MASTER_KEY, workerId, {
-        keySize: 256/32,
+        keySize: 256 / 32,
         iterations: 150
     });
     return derived.toString();
@@ -949,7 +949,7 @@ function deriveWorkerKey(workerId) {
 function compressData(profile) {
     // 1. Demographics
     const id = profile.id.trim();
-    const name = profile.name.trim().replace(/\|/g, ''); 
+    const name = profile.name.trim().replace(/\|/g, '');
     const age = parseInt(profile.age) || 0;
     const gender = profile.gender || 'O';
     const blood = profile.bloodGroup || 'O+';
@@ -1039,7 +1039,7 @@ function decompressData(encryptedPayload) {
         if (splitIndex === -1) {
             throw new Error("Invalid payload format (Missing worker hint)");
         }
-        
+
         const workerId = encryptedPayload.substring(0, splitIndex);
         const ciphertext = encryptedPayload.substring(splitIndex + 1);
 
@@ -1047,7 +1047,7 @@ function decompressData(encryptedPayload) {
         const cardKey = deriveWorkerKey(workerId);
         const decryptedBytes = CryptoJS.AES.decrypt(ciphertext, cardKey);
         const decryptedText = decryptedBytes.toString(CryptoJS.enc.Utf8);
-        
+
         if (!decryptedText) {
             throw new Error("AES Decryption failed (invalid key)");
         }
@@ -1154,7 +1154,7 @@ function setupGenerator() {
         const allergies = document.getElementById('worker-allergies').value;
         const disability = document.getElementById('worker-disability').value;
         const donor = document.getElementById('worker-donor').value;
-        
+
         let pregnancy = 'N';
         if (gender === 'F') {
             pregnancy = document.getElementById('worker-pregnancy').value;
@@ -1193,7 +1193,7 @@ function setupGenerator() {
 
         // 2. Compress and Encrypt
         const result = compressData(profile);
-        
+
         // Full payload prefixed with Hint ID
         const qrPayload = `${workerId}:${result.encrypted}`;
 
@@ -1202,7 +1202,7 @@ function setupGenerator() {
         const rawJsonSize = rawJsonString.length;
         const encryptedSize = qrPayload.length;
         const compRatio = Math.round(100 - ((result.rawPayloadLength / rawJsonSize) * 100));
-        
+
         // QR capacity safe ceiling
         const capacityPct = Math.min(Math.round((encryptedSize / 700) * 100), 100);
 
@@ -1211,7 +1211,7 @@ function setupGenerator() {
         document.getElementById('stats-encrypted-size').innerText = `${encryptedSize} B`;
         document.getElementById('stats-comp-ratio').innerText = `${compRatio}%`;
         document.getElementById('stats-qr-percentage').innerText = `${capacityPct}%`;
-        
+
         const fillBar = document.getElementById('stats-qr-fill');
         fillBar.style.width = `${capacityPct}%`;
         if (capacityPct > 85) {
@@ -1223,12 +1223,12 @@ function setupGenerator() {
         // 4. Update preview card values
         document.getElementById('preview-id').innerText = workerId;
         document.getElementById('preview-name').innerText = name;
-        
+
         const genderLabel = { 'M': 'Male', 'F': 'Female', 'O': 'Other' }[gender] || 'Other';
         document.getElementById('preview-meta').innerText = `${genderLabel} | ${age} Yrs`;
         document.getElementById('preview-blood').innerText = bloodGroup;
         document.getElementById('preview-em-contact').innerText = `${emName} (${emPhone})`;
-        
+
         const todayStr = new Date().toISOString().split('T')[0];
         document.getElementById('preview-issue-date').innerText = todayStr;
 
@@ -1266,7 +1266,7 @@ function setupGenerator() {
             profile.photo = activeWorkerPhotoBase64;
             profile.issueDate = todayStr;
             profile.notes = []; // Consultation clinical logs placeholder
-            
+
             saveProfileToLocalDB(profile);
             refreshDashboardAnalytics();
         });
@@ -1308,7 +1308,7 @@ function refreshDashboardAnalytics() {
 
     // 1. Basic Stats count
     totalCardsEl.innerText = registry.length;
-    
+
     // Emergency scan counter
     const emergencyCount = parseInt(localStorage.getItem('nirantar_emergency_scans_count') || '0');
     emergencyScansEl.innerText = emergencyCount;
@@ -1416,7 +1416,7 @@ function executeRegistrySearch() {
     const emptyState = document.getElementById('search-empty-state');
 
     resultsBody.innerHTML = '';
-    
+
     const filtered = registry.filter(p => {
         if (!query) return true;
         if (type === 'id') return p.id.toLowerCase().includes(query);
@@ -1464,7 +1464,7 @@ function executeRegistrySearch() {
 window.openProfileFromDashboard = (workerId) => {
     const profile = getProfileFromLocalDB(workerId);
     if (!profile) return;
-    
+
     // Switch to scanner view
     document.querySelectorAll('.nav-btn').forEach(btn => {
         if (btn.dataset.target === 'scanner-view') btn.classList.add('active');
@@ -1474,7 +1474,7 @@ window.openProfileFromDashboard = (workerId) => {
         if (c.id === 'scanner-view') c.classList.add('active');
         else c.classList.remove('active');
     });
-    
+
     // Bypass scanning step, populate UI directly
     activeScannedProfile = profile;
     populateEmergencyDashboard(profile);
@@ -1502,7 +1502,7 @@ function setupScanner() {
     document.getElementById('btn-view-full-record').addEventListener('click', () => {
         document.getElementById('emergency-dashboard').style.display = 'none';
         document.getElementById('health-dashboard').style.display = 'block';
-        
+
         // Add default timelines
         populateFullDashboard(activeScannedProfile);
     });
@@ -1540,7 +1540,7 @@ function setupScanner() {
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length === 0) return;
         const file = e.target.files[0];
-        
+
         if (!currentScanner) {
             currentScanner = new Html5Qrcode("reader");
         }
@@ -1567,7 +1567,7 @@ function startScanning() {
     }
 
     const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-    
+
     currentScanner.start(
         { facingMode: "environment" },
         config,
@@ -1630,10 +1630,10 @@ function handleScanSuccess(payload) {
 function populateEmergencyDashboard(profile) {
     document.getElementById('scanner-placeholder').style.display = 'none';
     document.getElementById('health-dashboard').style.display = 'none';
-    
+
     const emergencyDash = document.getElementById('emergency-dashboard');
     emergencyDash.style.display = 'flex';
-    
+
     // Security verification signature tags
     const verifyShield = document.getElementById('verify-shield');
     if (profile.isAuthentic || profile.photo !== undefined) {
@@ -1643,7 +1643,7 @@ function populateEmergencyDashboard(profile) {
         verifyShield.className = "verify-badge failed";
         verifyShield.innerText = "⚠️ Unverified Checksum";
     }
-    
+
     document.getElementById('verify-version').innerText = profile.version || CONFIG.VERSION;
     document.getElementById('verify-date').innerText = profile.issueDate || new Date().toISOString().split('T')[0];
 
@@ -1724,12 +1724,12 @@ function populateFullDashboard(profile) {
     document.getElementById('dash-avatar').innerText = profile.name.charAt(0).toUpperCase();
     document.getElementById('dash-name').innerText = profile.name;
     document.getElementById('dash-id').innerText = profile.id;
-    
+
     // Demographics and BMI
     const genderFull = { 'M': 'Male', 'F': 'Female', 'O': 'Other' }[profile.gender] || 'Other';
     const heightM = (profile.height || 170) / 100;
     const bmiVal = ((profile.weight || 60) / (heightM * heightM)).toFixed(1);
-    
+
     // BMI Category label mapping
     let bmiLabel = "Normal";
     if (bmiVal < 18.5) bmiLabel = "Underweight";
@@ -1790,7 +1790,7 @@ function populateFullDashboard(profile) {
 
 function calculateHealthRisk(profile) {
     let score = 0;
-    
+
     // Demographic risks
     if (profile.age > 55) score += 2;
     else if (profile.age > 40) score += 1;
@@ -1818,7 +1818,7 @@ function calculateHealthRisk(profile) {
 function renderInteractiveTimeline(profile) {
     const track = document.getElementById('dash-timeline-track');
     track.innerHTML = '';
-    
+
     const events = [];
 
     // 1. Gather hospital visits
@@ -1911,15 +1911,19 @@ function resetScannerUI() {
     activeScannedProfile = null;
 }
 
- / /   - - -   S p l a s h   S c r e e n   L o g i c   - - - 
- w i n d o w . a d d E v e n t L i s t e n e r ( ' l o a d ' ,   ( )   = >   { 
-         s e t T i m e o u t ( ( )   = >   { 
-                 d o c u m e n t . b o d y . c l a s s L i s t . a d d ( ' a p p - l o a d e d ' ) ; 
-                 s e t T i m e o u t ( ( )   = >   { 
-                         c o n s t   s p l a s h   =   d o c u m e n t . g e t E l e m e n t B y I d ( ' s p l a s h - s c r e e n ' ) ; 
-                         i f ( s p l a s h )   s p l a s h . r e m o v e ( ) ; 
-                 } ,   8 0 0 ) ; 
-         } ,   1 5 0 0 ) ;   / /   D i s p l a y   s p l a s h   f o r   1 . 5   s e c o n d s 
- } ) ; 
-  
- 
+// --- Splash Screen Logic ---
+window.addEventListener("load", () => {
+
+    setTimeout(() => {
+
+        const splash = document.getElementById("splash-screen");
+
+        splash.style.opacity = "0";
+
+        setTimeout(() => {
+            splash.remove();
+        }, 800);
+
+    }, 5000);
+
+});
