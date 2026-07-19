@@ -135,6 +135,7 @@ export const translations = {
         ageGender: "Age/Gender",
         noWorkersFound: "No workers found matching your query.",
 
+        aadhaarNumber: 'Aadhaar Number (12 Digits)', verifyAadhaar: 'Verify via OTP', enterOtp: 'Enter OTP sent to registered mobile', submitOtp: 'Submit OTP', aadhaarVerified: 'Aadhaar Verified',
     },
     hi: {
         appTitle: "निरंतर स्वास्थ्य",
@@ -266,6 +267,7 @@ export const translations = {
         ageGender: "आयु/लिंग",
         noWorkersFound: "आपकी क्वेरी से मेल खाने वाले कोई श्रमिक नहीं मिले।",
 
+        aadhaarNumber: 'आधार संख्या (12 अंक)', verifyAadhaar: 'OTP द्वारा सत्यापित करें', enterOtp: 'पंजीकृत मोबाइल पर भेजा गया OTP दर्ज करें', submitOtp: 'OTP सबमिट करें', aadhaarVerified: 'आधार सत्यापित',
     },
     bn: {
         appTitle: "নিরন্তর স্বাস্থ্য",
@@ -397,6 +399,7 @@ export const translations = {
         ageGender: "বয়স/লিঙ্গ",
         noWorkersFound: "আপনার অনুসন্ধানের সাথে মেলে এমন কোন শ্রমিক পাওয়া যায়নি।",
 
+        aadhaarNumber: 'আধার নম্বর (১২ সংখ্যা)', verifyAadhaar: 'OTP-এর মাধ্যমে যাচাই করুন', enterOtp: 'নিবন্ধিত মোবাইলে পাঠানো OTP লিখুন', submitOtp: 'OTP জমা দিন', aadhaarVerified: 'আধার যাচাইকৃত',
     },
     ta: {
         appTitle: "நிரந்தர் சுகாதாரம்",
@@ -528,6 +531,7 @@ export const translations = {
         ageGender: "வயது/பாலினம்",
         noWorkersFound: "எந்த தொழிலாளரும் கிடைக்கவில்லை.",
 
+        aadhaarNumber: 'ஆதார் எண் (12 இலக்கங்கள்)', verifyAadhaar: 'OTP மூலம் சரிபார்க்கவும்', enterOtp: 'பதிவு செய்யப்பட்ட மொபைலுக்கு அனுப்பப்பட்ட OTP ஐ உள்ளிடவும்', submitOtp: 'OTP ஐ சமர்ப்பிக்கவும்', aadhaarVerified: 'ஆதார் சரிபார்க்கப்பட்டது',
     },
     te: {
         appTitle: "నిరంతర్ ఆరోగ్యం",
@@ -659,6 +663,7 @@ export const translations = {
         ageGender: "వయస్సు/లింగం",
         noWorkersFound: "ఎటువంటి కార్మికులు కనుగొనబడలేదు.",
 
+        aadhaarNumber: 'ఆధార్ నంబర్ (12 అంకెలు)', verifyAadhaar: 'OTP ద్వారా ధృవీకరించండి', enterOtp: 'నమోదిత మొబైల్‌కు పంపిన OTPని నమోదు చేయండి', submitOtp: 'OTPని సమర్పించండి', aadhaarVerified: 'ఆధార్ ధృవీకరించబడింది',
     },
     mr: {
         appTitle: "निरंतर आरोग्य",

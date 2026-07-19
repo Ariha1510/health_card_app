@@ -6,6 +6,7 @@ const FollowUpTracking = () => {
     const { t } = useLanguage();
     const [followUps, setFollowUps] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [smsStatus, setSmsStatus] = useState({});
 
     useEffect(() => {
         const fetchFollowUps = async () => {
@@ -52,6 +53,13 @@ const FollowUpTracking = () => {
         setFollowUps(followUps.filter(f => f.id !== id));
     };
 
+    const handleSendSms = (id) => {
+        setSmsStatus(prev => ({ ...prev, [id]: 'sending' }));
+        setTimeout(() => {
+            setSmsStatus(prev => ({ ...prev, [id]: 'sent' }));
+        }, 1500);
+    };
+
     return (
         <div className="view-container active">
             <h2 style={{ marginBottom: '1.5rem' }}>{t('followUpTitle')}</h2>
@@ -84,13 +92,29 @@ const FollowUpTracking = () => {
                                         <td><span style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--accent-danger)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.85rem' }}>{item.reason}</span></td>
                                         <td>{new Date(item.due_date).toLocaleDateString()}</td>
                                         <td>
-                                            <button 
-                                                className="btn-primary" 
-                                                style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}
-                                                onClick={() => handleMarkComplete(item.id)}
-                                            >
-                                                {t('markDone')}
-                                            </button>
+                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                                <button 
+                                                    className="btn-primary" 
+                                                    style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}
+                                                    onClick={() => handleMarkComplete(item.id)}
+                                                >
+                                                    {t('markDone')}
+                                                </button>
+                                                <button 
+                                                    className="btn-secondary" 
+                                                    style={{ 
+                                                        padding: '0.25rem 0.75rem', 
+                                                        fontSize: '0.85rem',
+                                                        backgroundColor: smsStatus[item.id] === 'sent' ? '#10b981' : '',
+                                                        borderColor: smsStatus[item.id] === 'sent' ? '#10b981' : '',
+                                                        color: smsStatus[item.id] === 'sent' ? 'white' : ''
+                                                    }}
+                                                    onClick={() => handleSendSms(item.id)}
+                                                    disabled={smsStatus[item.id] === 'sending' || smsStatus[item.id] === 'sent'}
+                                                >
+                                                    {smsStatus[item.id] === 'sending' ? 'Sending...' : smsStatus[item.id] === 'sent' ? '✅ Sent' : '📱 SMS'}
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}

@@ -39,11 +39,11 @@ function App() {
   return (
     <LanguageProvider>
       {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
-      
+
       {!showSplash && (
         <div className="app-container">
           <Header role={role} />
-          
+
           <main>
             <Routes>
               <Route path="/" element={<CampDashboard />} />
