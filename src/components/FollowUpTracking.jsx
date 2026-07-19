@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabaseClient';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const FollowUpTracking = () => {
+    const { t } = useLanguage();
     const [followUps, setFollowUps] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -52,26 +54,26 @@ const FollowUpTracking = () => {
 
     return (
         <div className="view-container active">
-            <h2 style={{ marginBottom: '1.5rem' }}>Follow-up Tracking</h2>
+            <h2 style={{ marginBottom: '1.5rem' }}>{t('followUpTitle')}</h2>
             
             <div className="card-panel">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <h3>Pending Follow-ups ({followUps.length})</h3>
+                    <h3>{t('pendingFollowUps')} ({followUps.length})</h3>
                     <input type="date" style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border-color)' }} />
                 </div>
 
                 {loading ? (
-                    <p>Loading follow-ups...</p>
+                    <p>{t('loadingFollowUps')}</p>
                 ) : (
                     <div className="search-results-table-container">
                         <table className="search-results-table">
                             <thead>
                                 <tr>
-                                    <th>Patient Name</th>
-                                    <th>Phone</th>
-                                    <th>Reason</th>
-                                    <th>Due Date</th>
-                                    <th>Action</th>
+                                    <th>{t('patientName')}</th>
+                                    <th>{t('phone')}</th>
+                                    <th>{t('reason')}</th>
+                                    <th>{t('dueDate')}</th>
+                                    <th>{t('action')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -87,7 +89,7 @@ const FollowUpTracking = () => {
                                                 style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}
                                                 onClick={() => handleMarkComplete(item.id)}
                                             >
-                                                Mark Done
+                                                {t('markDone')}
                                             </button>
                                         </td>
                                     </tr>
@@ -96,7 +98,7 @@ const FollowUpTracking = () => {
                         </table>
                         {followUps.length === 0 && (
                             <div className="table-empty-state">
-                                No pending follow-ups for this period.
+                                {t('noPending')}
                             </div>
                         )}
                     </div>

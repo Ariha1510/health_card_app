@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabaseClient';
+import { useLanguage } from '../contexts/LanguageContext';
 import QRCode from 'react-qr-code';
 import { User, Calendar, FileText, AlertCircle, Phone, MapPin, Activity } from 'lucide-react';
 
 const WorkerDashboard = () => {
+    const { t } = useLanguage();
     const [workerId, setWorkerId] = useState(localStorage.getItem('myWorkerId') || '');
     const [inputId, setInputId] = useState('');
     const [worker, setWorker] = useState(null);
@@ -63,8 +65,8 @@ const WorkerDashboard = () => {
         return (
             <div className="view-container active" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
                 <div className="card-panel" style={{ maxWidth: '400px', width: '100%', textAlign: 'center' }}>
-                    <h2 style={{ marginBottom: '1rem' }}>Welcome, Worker!</h2>
-                    <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Please enter your unique Health ID to access your digital health passport.</p>
+                    <h2 style={{ marginBottom: '1rem' }}>{t('welcomeWorker')}</h2>
+                    <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>{t('enterIdPrompt')}</p>
                     <form onSubmit={handleSearch}>
                         <div className="form-group">
                             <input 
@@ -77,7 +79,7 @@ const WorkerDashboard = () => {
                             />
                         </div>
                         <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
-                            View My Profile
+                            {t('viewProfileBtn')}
                         </button>
                     </form>
                 </div>
@@ -109,24 +111,58 @@ const WorkerDashboard = () => {
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'left', background: 'var(--background-color)', padding: '1rem', borderRadius: '8px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><User size={18} color="var(--text-muted)"/> {worker.age} yrs • {worker.gender} • {worker.blood_group || 'N/A'}</div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><Phone size={18} color="var(--text-muted)"/> {worker.phone}</div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><MapPin size={18} color="var(--text-muted)"/> {worker.worksite || 'N/A'}</div>
+                            
+                            <div style={{ borderTop: '1px solid var(--border-color)', margin: '0.5rem 0' }}></div>
+                            
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><Phone size={18} color="var(--text-muted)"/> 
+                                <div>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>{t('phoneNum')}</span>
+                                    {worker.phone}
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><AlertCircle size={18} color="var(--text-muted)"/> 
+                                <div>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>{t('emergencyContact')}</span>
+                                    {worker.emergency_contact || 'N/A'}
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><MapPin size={18} color="var(--text-muted)"/> 
+                                <div>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>{t('homeAddress')}</span>
+                                    {worker.address || 'N/A'}
+                                </div>
+                            </div>
+                            
+                            <div style={{ borderTop: '1px solid var(--border-color)', margin: '0.5rem 0' }}></div>
+                            
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><FileText size={18} color="var(--text-muted)"/> 
+                                <div>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>{t('occupation')}</span>
+                                    {worker.occupation || 'N/A'}
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><MapPin size={18} color="var(--text-muted)"/> 
+                                <div>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>{t('worksiteLoc')}</span>
+                                    {worker.worksite || 'N/A'}
+                                </div>
+                            </div>
                         </div>
                         
                         <button onClick={() => setWorkerId('')} style={{ marginTop: '2rem', padding: '0.75rem 1.5rem', background: 'var(--surface-color)', border: '1px solid var(--border-color)', color: 'var(--text-color)', borderRadius: '6px', cursor: 'pointer', width: '100%' }}>
-                            Switch ID
+                            {t('switchId')}
                         </button>
                     </div>
 
                     {/* Right Column: History */}
                     <div>
                         <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <Activity size={24} color="var(--accent-primary)" /> Medical Timeline
+                            <Activity size={24} color="var(--accent-primary)" /> {t('medTimeline')}
                         </h2>
                         
                         {screenings.length === 0 ? (
                             <div className="card-panel" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-                                No medical history found.
+                                {t('noHistory')}
                             </div>
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -134,8 +170,8 @@ const WorkerDashboard = () => {
                                     <div key={s.id} className="card-panel" style={{ borderLeft: '4px solid var(--accent-primary)' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border-color)' }}>
                                             <div>
-                                                <h4 style={{ margin: '0 0 5px 0', color: 'var(--accent-primary)' }}>Camp: {s.camp_location || 'General'}</h4>
-                                                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Dr. {s.doctor_name || 'Unknown'}</span>
+                                                <h4 style={{ margin: '0 0 5px 0', color: 'var(--accent-primary)' }}>{t('camp')} {s.camp_location || 'General'}</h4>
+                                                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{t('dr')} {s.doctor_name || 'Unknown'}</span>
                                             </div>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
                                                 <Calendar size={16} /> {new Date(s.created_at).toLocaleDateString()}
@@ -144,12 +180,12 @@ const WorkerDashboard = () => {
                                         
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                                             <div style={{ background: 'var(--background-color)', padding: '0.75rem', borderRadius: '6px' }}>
-                                                <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Vitals</span>
-                                                <strong>BP:</strong> {s.bp_systolic}/{s.bp_diastolic} <br/>
-                                                <strong>Sugar:</strong> {s.sugar_level}
+                                                <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('vitals')}</span>
+                                                <strong>{t('bp')}</strong> {s.bp_systolic}/{s.bp_diastolic} <br/>
+                                                <strong>{t('sugar')}</strong> {s.sugar_level}
                                             </div>
                                             <div style={{ background: 'var(--background-color)', padding: '0.75rem', borderRadius: '6px' }}>
-                                                <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Diagnosis</span>
+                                                <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('diagnosis')}</span>
                                                 {s.diagnosis || 'None'}
                                             </div>
                                         </div>
@@ -157,7 +193,7 @@ const WorkerDashboard = () => {
                                         {s.prescription && (
                                             <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '1rem', borderRadius: '6px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
                                                 <h5 style={{ margin: '0 0 8px 0', color: '#10b981', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                                    <FileText size={16}/> Prescription
+                                                    <FileText size={16}/> {t('prescription')}
                                                 </h5>
                                                 <p style={{ margin: 0, fontSize: '0.9rem' }}>{s.prescription}</p>
                                             </div>

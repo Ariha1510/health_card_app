@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Scanner = () => {
+    const { t } = useLanguage();
     const [scannedId, setScannedId] = useState('');
     const navigate = useNavigate();
 
@@ -23,7 +25,7 @@ const Scanner = () => {
                     // Navigate to screening page with the ID pre-filled
                     navigate(`/screening?id=${decodedText}`);
                 } else {
-                    alert("Invalid QR Code. Please scan a valid Nirantar Health Worker ID.");
+                    alert(t('invalidQR'));
                 }
             }, 
             (error) => {}
@@ -37,16 +39,16 @@ const Scanner = () => {
     return (
         <div className="view-container active">
             <div className="card-panel" style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
-                <h2>Scan Patient QR Code</h2>
+                <h2>{t('scanPatientQR')}</h2>
                 <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
-                    Hold the patient's Health ID QR code up to your camera. You will be automatically redirected to their medical file.
+                    {t('scanQRHelp')}
                 </p>
                 <div style={{ background: 'var(--surface-color)', padding: '1rem', borderRadius: '12px' }}>
                     <div id="reader" style={{ width: '100%', border: 'none' }}></div>
                 </div>
                 {scannedId && (
                     <div style={{ marginTop: '2rem', padding: '1rem', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderRadius: '8px' }}>
-                        Success! Scanned ID: {scannedId} <br/> Redirecting...
+                        {t('scanSuccess')} {scannedId} <br/> {t('redirecting')}
                     </div>
                 )}
             </div>

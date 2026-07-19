@@ -2,8 +2,10 @@ import React from 'react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { FileText, Download } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Reports = () => {
+    const { t } = useLanguage();
     const generateDailyReport = () => {
         const doc = new jsPDF();
         
@@ -39,18 +41,18 @@ const Reports = () => {
 
     return (
         <div className="view-container active">
-            <h2 style={{ marginBottom: '1.5rem' }}>Reports & Analytics</h2>
+            <h2 style={{ marginBottom: '1.5rem' }}>{t('reportsTitle')}</h2>
             
             <div className="action-grid" style={{ marginTop: '1.5rem' }}>
                 <div className="action-card generate" style={{ textAlign: 'center', padding: '2rem' }}>
                     <div className="action-card-icon" style={{ justifyContent: 'center', marginBottom: '1rem' }}>
                         <FileText size={48} color="var(--accent-primary)" />
                     </div>
-                    <h3>Daily Camp Report</h3>
-                    <p>Generate a PDF summary of today's registrations and screenings.</p>
+                    <h3>{t('dailyCampReport')}</h3>
+                    <p>{t('dailyCampDesc')}</p>
                     <button className="btn-primary" style={{ margin: '1rem auto 0' }} onClick={generateDailyReport}>
                         <Download size={18} style={{ marginRight: '8px' }} />
-                        Download PDF
+                        {t('downloadPdf')}
                     </button>
                 </div>
 
@@ -58,10 +60,10 @@ const Reports = () => {
                     <div className="action-card-icon" style={{ justifyContent: 'center', marginBottom: '1rem' }}>
                         <FileText size={48} color="var(--accent-secondary)" />
                     </div>
-                    <h3>Monthly District Report</h3>
-                    <p>Aggregate data across all camps in the district for the month.</p>
+                    <h3>{t('monthlyDistReport')}</h3>
+                    <p>{t('monthlyDistDesc')}</p>
                     <button className="btn-secondary" style={{ margin: '1rem auto 0' }} disabled>
-                        Coming Soon
+                        {t('comingSoon')}
                     </button>
                 </div>
             </div>

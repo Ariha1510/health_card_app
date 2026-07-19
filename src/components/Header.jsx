@@ -12,37 +12,37 @@ const Header = () => {
                 <div className="logo-section">
                     <div className="logo-icon">N</div>
                     <div className="logo-text">
-                        <h1>Nirantar Health</h1>
-                        <p>Continuity of Care Network</p>
+                        <h1>{t('appTitle')}</h1>
+                        <p>{t('appSubtitle')}</p>
                     </div>
                 </div>
                 <nav className="nav-links">
                     <NavLink to="/" className={({isActive}) => `nav-btn ${isActive ? 'active' : ''}`}>
-                        Dashboard
-                    </NavLink>
-                    <NavLink to="/worker" className={({isActive}) => `nav-btn ${isActive ? 'active' : ''}`}>
-                        Worker Passport
+                        {t('navDashboard')}
                     </NavLink>
                     <NavLink to="/register" className={({isActive}) => `nav-btn ${isActive ? 'active' : ''}`}>
-                        Register
+                        {t('navRegister')}
                     </NavLink>
                     <NavLink to="/screening" className={({isActive}) => `nav-btn ${isActive ? 'active' : ''}`}>
-                        Screening
+                        {t('navScreening')}
                     </NavLink>
                     <NavLink to="/follow-ups" className={({isActive}) => `nav-btn ${isActive ? 'active' : ''}`}>
-                        Follow-ups
+                        {t('navFollowUps')}
                     </NavLink>
                     <NavLink to="/search" className={({isActive}) => `nav-btn ${isActive ? 'active' : ''}`}>
-                        Search
+                        {t('navSearch')}
                     </NavLink>
                     <NavLink to="/doctors" className={({isActive}) => `nav-btn ${isActive ? 'active' : ''}`}>
-                        Doctors
+                        {t('navDoctors')}
                     </NavLink>
                     <NavLink to="/reports" className={({isActive}) => `nav-btn ${isActive ? 'active' : ''}`}>
-                        Reports
+                        {t('navReports')}
                     </NavLink>
                     <NavLink to="/scanner" className={({isActive}) => `nav-btn ${isActive ? 'active' : ''}`}>
-                        QR Scan
+                        {t('navScanner')}
+                    </NavLink>
+                    <NavLink to="/worker" className={({isActive}) => `nav-btn ${isActive ? 'active' : ''}`}>
+                        {t('navWorkerPassport')}
                     </NavLink>
                 </nav>
 

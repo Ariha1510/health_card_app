@@ -1844,3 +1844,46 @@ footer {
     animation: titleFade 0.8s ease 0.7s forwards;
     opacity: 0;
 }
+
+/* Form Styles Added as requested */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: #e8f4f4;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    background: #08191d;
+    border: 2px solid #19d8d8;
+    border-radius: 14px;
+    color: #ffffff;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #7fa4a8;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #2cf5f5;
+    box-shadow: 0 0 8px rgba(44, 245, 245, 0.45);
+}
+
+.form-group textarea {
+    resize: none;
+    min-height: 90px;
+}

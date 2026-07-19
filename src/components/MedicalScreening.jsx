@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabaseClient';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useSearchParams } from 'react-router-dom';
 import { Sparkles, AlertTriangle, Pill, Stethoscope } from 'lucide-react';
 
 const MedicalScreening = () => {
+    const { t } = useLanguage();
     const [searchParams] = useSearchParams();
     const urlWorkerId = searchParams.get('id');
     
@@ -96,7 +98,7 @@ const MedicalScreening = () => {
     return (
         <div className="view-container active">
             <div className="card-panel" style={{ maxWidth: '800px', margin: '0 auto' }}>
-                <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>Medical Screening</h2>
+                <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>{t('medScreeningTitle')}</h2>
                 
                 {message && (
                     <div style={{ padding: '1rem', marginBottom: '1.5rem', borderRadius: '4px', backgroundColor: message.type === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: message.type === 'success' ? '#10b981' : '#ef4444', border: `1px solid ${message.type === 'success' ? '#10b981' : '#ef4444'}` }}>
@@ -105,9 +107,9 @@ const MedicalScreening = () => {
                 )}
 
                 <div className="form-group" style={{ marginBottom: '2rem' }}>
-                    <label>Select Patient</label>
+                    <label>{t('selectPatient')}</label>
                     <select value={selectedWorkerId} onChange={handleWorkerSelect} required style={{ border: '2px solid var(--accent-primary)' }}>
-                        <option value="">-- Scan QR or Select Worker --</option>
+                        <option value="">{t('scanOrSelect')}</option>
                         {workers.map(w => (
                             <option key={w.id} value={w.id}>{w.name} ({w.worker_id})</option>
                         ))}
@@ -117,30 +119,30 @@ const MedicalScreening = () => {
                 {selectedWorkerDetails && (
                     <div style={{ background: 'rgba(54, 162, 235, 0.05)', border: '1px solid var(--accent-primary)', borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem' }}>
                         <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-primary)', margin: '0 0 1rem 0' }}>
-                            <Sparkles size={20} /> AI Clinical Assistant Summary
+                            <Sparkles size={20} /> {t('aiSummary')}
                         </h3>
                         
                         <p style={{ fontSize: '0.9rem', color: 'var(--text-color)', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-                            Based on past records, <strong>{selectedWorkerDetails.name}</strong> ({selectedWorkerDetails.age}y, {selectedWorkerDetails.gender}) has visited Nirantar Health camps twice in the last 12 months. Historical vitals indicate borderline hypertension. No recent vaccinations recorded.
+                            <strong>{selectedWorkerDetails.name}</strong> ({selectedWorkerDetails.age}y, {selectedWorkerDetails.gender}) - {t('aiContext')}
                         </p>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                             <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '1rem', borderRadius: '8px' }}>
                                 <h4 style={{ color: '#ef4444', margin: '0 0 0.5rem 0', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                    <AlertTriangle size={16}/> High Risk Indicators
+                                    <AlertTriangle size={16}/> {t('highRisk')}
                                 </h4>
                                 <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.85rem' }}>
-                                    <li>Hypertension (Avg BP: 145/90)</li>
-                                    <li>Dust Allergy (Reported 2023)</li>
+                                    <li>{t('htnDesc')}</li>
+                                    <li>{t('allergyDesc')}</li>
                                 </ul>
                             </div>
                             
                             <div style={{ background: 'var(--surface-color)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                                 <h4 style={{ margin: '0 0 0.5rem 0', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                    <Pill size={16}/> Active Medications
+                                    <Pill size={16}/> {t('activeMeds')}
                                 </h4>
                                 <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.85rem' }}>
-                                    <li>Amlodipine 5mg (Prescribed 6mo ago)</li>
+                                    <li>{t('medDesc')}</li>
                                 </ul>
                             </div>
                         </div>
@@ -150,78 +152,78 @@ const MedicalScreening = () => {
                 <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
 
                     <div className="form-group">
-                        <label>Camp Location</label>
+                        <label>{t('campLoc')}</label>
                         <input type="text" name="camp_location" value={formData.camp_location} onChange={handleChange} required />
                     </div>
 
                     <div className="form-group">
-                        <label>Doctor Name</label>
+                        <label>{t('drName')}</label>
                         <input type="text" name="doctor_name" value={formData.doctor_name} onChange={handleChange} required />
                     </div>
 
-                    <h4 style={{ gridColumn: '1 / -1', marginTop: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Vitals</h4>
+                    <h4 style={{ gridColumn: '1 / -1', marginTop: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>{t('vitalsTitle')}</h4>
 
                     <div className="form-group" style={{ display: 'flex', gap: '1rem' }}>
                         <div style={{ flex: 1 }}>
-                            <label>BP (Systolic)</label>
+                            <label>{t('bpSys')}</label>
                             <input type="number" name="bp_systolic" value={formData.bp_systolic} onChange={handleChange} placeholder="120" />
                         </div>
                         <div style={{ flex: 1 }}>
-                            <label>BP (Diastolic)</label>
+                            <label>{t('bpDia')}</label>
                             <input type="number" name="bp_diastolic" value={formData.bp_diastolic} onChange={handleChange} placeholder="80" />
                         </div>
                     </div>
 
                     <div className="form-group">
-                        <label>Sugar Level (mg/dL)</label>
+                        <label>{t('sugarLevel')}</label>
                         <input type="number" name="sugar_level" value={formData.sugar_level} onChange={handleChange} />
                     </div>
 
                     <div className="form-group">
-                        <label>BMI</label>
+                        <label>{t('bmi')}</label>
                         <input type="number" step="0.1" name="bmi" value={formData.bmi} onChange={handleChange} />
                     </div>
 
                     <div className="form-group">
-                        <label>Temperature (°F)</label>
+                        <label>{t('tempF')}</label>
                         <input type="number" step="0.1" name="temperature" value={formData.temperature} onChange={handleChange} />
                     </div>
                     
                     <div className="form-group">
-                        <label>Oxygen Level (SpO2 %)</label>
+                        <label>{t('oxygen')}</label>
                         <input type="number" name="oxygen_level" value={formData.oxygen_level} onChange={handleChange} />
                     </div>
 
-                    <h4 style={{ gridColumn: '1 / -1', marginTop: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Diagnosis & Treatment</h4>
+                    <h4 style={{ gridColumn: '1 / -1', marginTop: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>{t('diagTreatment')}</h4>
 
                     <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                        <label>Symptoms</label>
+                        <label>{t('symptoms')}</label>
                         <textarea name="symptoms" value={formData.symptoms} onChange={handleChange} rows="2"></textarea>
                     </div>
 
                     <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                        <label>Diagnosis</label>
+                        <label>{t('diagnosis')}</label>
                         <textarea name="diagnosis" value={formData.diagnosis} onChange={handleChange} rows="2"></textarea>
                     </div>
 
                     <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                        <label>Prescription</label>
+                        <label>{t('prescription')}</label>
                         <textarea name="prescription" value={formData.prescription} onChange={handleChange} rows="2"></textarea>
                     </div>
                     
                     <div className="form-group">
-                        <label>Vaccinations Given</label>
+                        <label>{t('vaccGiven')}</label>
                         <input type="text" name="vaccinations" value={formData.vaccinations} onChange={handleChange} placeholder="e.g. Tetanus, COVID-19" />
                     </div>
                     
                     <div className="form-group">
-                        <label>Referral to Specialist/Hospital</label>
+                        <label>{t('referral')}</label>
                         <input type="text" name="referral" value={formData.referral} onChange={handleChange} />
                     </div>
 
                     <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
                         <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={loading}>
-                            {loading ? 'Saving...' : 'Save Screening Record'}
+                            {loading ? t('saving') : t('saveRecord')}
                         </button>
                     </div>
                 </form>

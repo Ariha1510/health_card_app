@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { supabase } from '../utils/supabaseClient';
 import { Search } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const SearchWorker = () => {
+    const { t } = useLanguage();
     const [searchQuery, setSearchQuery] = useState('');
     const [searchType, setSearchType] = useState('worker_id');
     const [results, setResults] = useState([]);
@@ -40,7 +42,7 @@ const SearchWorker = () => {
 
     return (
         <div className="view-container active">
-            <h2 style={{ marginBottom: '1.5rem' }}>Search Worker Database</h2>
+            <h2 style={{ marginBottom: '1.5rem' }}>{t('searchWorkerDb')}</h2>
             
             <div className="card-panel search-ledger-panel">
                 <form onSubmit={handleSearch} className="search-bar-row">
@@ -49,21 +51,21 @@ const SearchWorker = () => {
                         value={searchType}
                         onChange={e => setSearchType(e.target.value)}
                     >
-                        <option value="worker_id">Worker ID</option>
-                        <option value="name">Name</option>
-                        <option value="phone">Phone</option>
-                        <option value="employer">Employer</option>
+                        <option value="worker_id">{t('workerId')}</option>
+                        <option value="name">{t('nameLabel')}</option>
+                        <option value="phone">{t('phone')}</option>
+                        <option value="employer">{t('employer')}</option>
                     </select>
                     <input
                         type="text"
-                        placeholder="Type to search..."
+                        placeholder={t('typeToSearch')}
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
                         style={{ flex: 1 }}
                     />
                     <button type="submit" className="btn-primary" disabled={loading} style={{ padding: '0.5rem 1rem' }}>
                         <Search size={18} style={{ marginRight: '5px' }} />
-                        {loading ? 'Searching...' : 'Search'}
+                        {loading ? t('searching') : t('search')}
                     </button>
                 </form>
 
@@ -72,12 +74,12 @@ const SearchWorker = () => {
                         <table className="search-results-table">
                             <thead>
                                 <tr>
-                                    <th>Worker ID</th>
-                                    <th>Name</th>
-                                    <th>Age/Gender</th>
-                                    <th>Blood Group</th>
-                                    <th>Employer</th>
-                                    <th>Phone</th>
+                                    <th>{t('workerId')}</th>
+                                    <th>{t('nameLabel')}</th>
+                                    <th>{t('ageGender')}</th>
+                                    <th>{t('bloodGroup')}</th>
+                                    <th>{t('employer')}</th>
+                                    <th>{t('phone')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -95,7 +97,7 @@ const SearchWorker = () => {
                         </table>
                         {results.length === 0 && (
                             <div className="table-empty-state">
-                                No workers found matching your query.
+                                {t('noWorkersFound')}
                             </div>
                         )}
                     </div>
